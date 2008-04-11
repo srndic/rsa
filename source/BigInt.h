@@ -118,7 +118,7 @@ class BigInt
 		//multiplies two unsigned char[]
 		static BigInt multiply(	unsigned char *a, unsigned long int na, 
 								unsigned char *b, unsigned long int nb, 
-								unsigned char *temp);
+								unsigned char *buf1);
 		//divides two BigInt numbers
 		static void divide(	const BigInt &dividend, const BigInt &divisor,
 							BigInt &quotient, BigInt &remainder);

@@ -24,20 +24,20 @@ int main(int argc, char *argv[])
 	try
 	{
 		/*CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT AND STREAM OUTPUT OPERATOR TEST*/
-//		TestBigIntFunctions();
+		TestBigIntFunctions();
 		/*				ARITHMETIC AND COMPARISON OPERATOR TEST	*/
-//		TestBigIntOperators();
+		TestBigIntOperators();
 		/*				FACTORIAL COMPUTATION BENCHMARK			*/
-//		FactorialBenchmark();
+		FactorialBenchmark();
 		/*				climits INFORMATION						*/
 //		LimitsInfo();
 		/*				RANDOM TEST GENERATOR					*/
-//		RandomBigIntTest(10);
+		RandomBigIntTest(100);
 		/*				RANDOM DIVISION TEST GENERATOR			*/
-//		RandomBigIntDivisionTest(55000);
+		RandomBigIntDivisionTest(550);
 /*				PRIME GENERATOR TEST					*/
-		TestPrimeGenerator(1000);
-		
+		TestPrimeGenerator(100);
+
 		pauseScreen();
 	}
 	catch (const char errorMessage[])

@@ -95,7 +95,7 @@ int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,
 //we use the Divide and Conquer a.k.a. Karatsuba algorithm
 BigInt BigInt::multiply(unsigned char *a, unsigned long int na, 
 						unsigned char *b, unsigned long int nb, 
-						unsigned char *temp)
+						unsigned char *buf1)
 {
 	unsigned long int longerLength(na);
 	unsigned char *longer(a);
@@ -114,22 +114,21 @@ BigInt BigInt::multiply(unsigned char *a, unsigned long int na,
 		BigInt result(toInt(a, na) * toInt(b, nb));
 		return result;
 	}
-		
-	unsigned long int 	al(na / 2 + (na & 1 ? 1 : 0)), 
-						ah(na - al),
-						bl(nb / 2 + (nb & 1 ? 1 : 0)), 
-						bh(nb - bl);
-	
-	BigInt p1(BigInt::multiply(a + al, ah, b + bl, bh, temp));
-	BigInt p2(BigInt::multiply(a, al, b, bl, temp));
-	BigInt::add(a + al, ah, a, al, temp, al + 1);
-	BigInt::add(b + bl, bh, b, bl, temp + al + 1 + 2, bl + 1);
-	BigInt p3(BigInt::multiply(	temp, al + 1, 
-								temp + al + 1 + 2, bl + 1, 
-								temp + al + 1 + 2 + bl + 1 + 2));
-		
 	if (longerLength & 1)
 		longerLength++;
+
+	//ah <= al, bh <= bl
+	unsigned long int 	ah(na >> 1), al(na - ah),
+						bh(nb >> 1), bl(nb - bh);
+	
+	BigInt p1(BigInt::multiply(a + al, ah, b + bl, bh, buf1));
+	BigInt p2(BigInt::multiply(a, al, b, bl, buf1));
+	BigInt::add(a + al, ah, a, al, buf1, al + 1);
+	BigInt::add(b + bl, bh, b, bl, buf1 + al + 1 + 2, bl + 1);
+	BigInt p3(BigInt::multiply(	buf1, al + 1, 
+								buf1 + al + 1 + 2, bl + 1, 
+								buf1 + al + 1 + 2 + bl + 1 + 2));
+		
 	BigInt result(	p1.shiftLeft(longerLength) + 
 					(p3 - p2 - p1).shiftLeft(longerLength / 2) + p2); 
 	return result;
@@ -258,7 +257,8 @@ BigInt &BigInt::shiftRight(unsigned long int n)
 	if (n >= digitCount)
 		throw "Error 13: Overflow on shift right.";
 	
-	std::copy_backward(digits + n, digits + digitCount, digits + digitCount - n);
+	std::copy_backward(	digits + n, digits + digitCount, 
+						digits + digitCount - n);
 	digitCount -= n;
 	return *this;
 }
@@ -714,30 +714,32 @@ BigInt operator*(	const BigInt &leftNum,
 		
 	int n(	(leftNum.digitCount < rightNum.digitCount ? 
 			rightNum.digitCount : leftNum.digitCount) + 2);
-	unsigned char *a(0);
+			
+	//we will use a temporary buffer for multiplication
+	unsigned char *buf1(0);
 	
 	try
 	{
-		a = new unsigned char[6 * n];
+		buf1 = new unsigned char[6 * n];
 	}
 	catch (...)
 	{
-		delete[] a;
+		delete[] buf1;
 		throw "Error 09: Not enough memory?";
 	}
 	
-	unsigned char *b(a + n), *temp(b + n);
+	unsigned char *b(buf1 + n), *c(b + n);
 	
-	std::copy(leftNum.digits, leftNum.digits + leftNum.digitCount, a);
-	std::fill(a + leftNum.digitCount, a + n, 0);	
+	std::copy(leftNum.digits, leftNum.digits + leftNum.digitCount, buf1);
+	std::fill(buf1 + leftNum.digitCount, buf1 + n, 0);	
 	std::copy(rightNum.digits, rightNum.digits + rightNum.digitCount, b);
 	std::fill(b + rightNum.digitCount, b + n, 0);
 	
-	BigInt result(BigInt::multiply(	a, n - 2,  
+	BigInt result(BigInt::multiply(	buf1, n - 2,  
 									b, n - 2, 
-									temp));
+									c));
 	
-	delete[] a;
+	delete[] buf1;
 	
 	return result;
 }

@@ -32,11 +32,11 @@ int main(int argc, char *argv[])
 		/*				climits INFORMATION						*/
 //		LimitsInfo();
 		/*				RANDOM TEST GENERATOR					*/
-		RandomBigIntTest(100);
+		RandomBigIntTest(1);
 		/*				RANDOM DIVISION TEST GENERATOR			*/
-		RandomBigIntDivisionTest(550);
+		RandomBigIntDivisionTest(5);
 /*				PRIME GENERATOR TEST					*/
-		TestPrimeGenerator(100);
+		TestPrimeGenerator(1);
 
 		pauseScreen();
 	}

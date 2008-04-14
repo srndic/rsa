@@ -44,6 +44,25 @@ static const BigInt ULongMax(ULONG_MAX);
 static const BigInt SqrtULongMax
 				(static_cast<unsigned long int>(sqrt(ULONG_MAX)));
 
+//transforms the number from unsigned long int to unsigned char[]
+//and pads the result with zeroes
+unsigned long int BigInt::intToUChar(	unsigned long int number, 
+										unsigned char *digits, 
+										unsigned long int padding = 0)
+{
+	int i(0);
+	do
+	{
+		//the number is stored in reverse
+		//(i.e. long int 456 is stored as unsigned char[] {[6][5][4]})
+		digits[i++] = number % 10;
+		number /= 10;
+	} while (number > 0);
+	
+	std::fill_n(digits + i, padding, 0);
+	return i;
+}
+
 //converts ascii digits to equivalent unsigned char numbers
 void BigInt::char2uchar(unsigned char *array, 
 						unsigned long int length)
@@ -93,45 +112,124 @@ int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,
 
 //multiplies two unsigned char []
 //we use the Divide and Conquer a.k.a. Karatsuba algorithm
-BigInt BigInt::multiply(unsigned char *a, unsigned long int na, 
-						unsigned char *b, unsigned long int nb, 
-						unsigned char *buf1)
+void BigInt::multiply(	unsigned char *a, unsigned char *b,
+						unsigned long int n,   
+						unsigned char *buf1, unsigned char *result)
 {
-	unsigned long int longerLength(na);
-	unsigned char *longer(a);
-	
-	//if *a < *b
-	if (compareNumbers(a, na, b, nb) == 2)
+	//if *a <= SqrtULongMax && *b <= SqrtULongMax, 
+	//the CPU can do the multiplication
+	if (compareNumbers(a, n, SqrtULongMax.digits, SqrtULongMax.digitCount) != 1 &&
+		compareNumbers(b, n, SqrtULongMax.digits, SqrtULongMax.digitCount) != 1)
 	{
-		longer = b;
-		longerLength = nb;
+		intToUChar(toInt(a, n) * toInt(b, n), buf1, n << 1);
+		return;
 	}
-	
-	//if bigger <= SqrtULongMax, the CPU can handle the multiplication
-	if (compareNumbers(	longer, longerLength, 
-						SqrtULongMax.digits, SqrtULongMax.digitCount) != 1)
-	{
-		BigInt result(toInt(a, na) * toInt(b, nb));
-		return result;
-	}
-	if (longerLength & 1)
-		longerLength++;
 
-	//ah <= al, bh <= bl
-	unsigned long int 	ah(na >> 1), al(na - ah),
-						bh(nb >> 1), bl(nb - bh);
+	//nh <= nl
+	unsigned long int 	nh(n >> 1), nl(n - nh), nt(nl + 1);
+	unsigned char *t1(buf1 + (n << 1));
 	
-	BigInt p1(BigInt::multiply(a + al, ah, b + bl, bh, buf1));
-	BigInt p2(BigInt::multiply(a, al, b, bl, buf1));
-	BigInt::add(a + al, ah, a, al, buf1, al + 1);
-	BigInt::add(b + bl, bh, b, bl, buf1 + al + 1 + 2, bl + 1);
-	BigInt p3(BigInt::multiply(	buf1, al + 1, 
-								buf1 + al + 1 + 2, bl + 1, 
-								buf1 + al + 1 + 2 + bl + 1 + 2));
-		
-	BigInt result(	p1.shiftLeft(longerLength) + 
-					(p3 - p2 - p1).shiftLeft(longerLength / 2) + p2); 
-	return result;
+	BigInt::add(a + nl, nh, a, nl, buf1, nt);
+	BigInt::add(b + nl, nh, b, nl, buf1 + nt, nt);
+	BigInt::multiply(a + nl, b + nl, nh, t1, t1);	//p1
+	BigInt::multiply(a, b, nl, t1 + (nh << 1), t1 + (nh << 1));		//p2
+	BigInt::multiply(buf1, buf1 + nt, nt, t1 + (n << 1), t1 + (n << 1));//p3
+	
+	unsigned long int power(n);
+	if (power & 1)
+		power++;
+	//copy and shift left p3 by power / 2 and pad right to n * 2 with zeroes
+	a = buf1 + (power >> 1);
+	std::fill(buf1, a, 0);
+	std::copy(t1 + (n << 1), t1 + ((n + nl) << 1) + 1, a);
+	std::fill(a + (nl << 1) + 1, t1, 0);
+	
+	//shifted p3 -= p2
+	//a == shifted p3, b == p2
+	b = t1 + (nh << 1);
+	unsigned char carry(0), sum(0);
+	for (unsigned long int i(0); i < (nl << 1); i++)
+	{
+		sum = 10 + a[i] - (b[i] + carry);
+		if (sum < 10)	//carry
+		{
+			a[i] = sum;
+			carry = 1;
+		}
+		else
+		{
+			a[i] = sum % 10;
+			carry = 0;
+		}
+	}
+	a = &a[nl << 1];
+	for (; carry && a < t1; a++)
+		if (*a)
+		{
+			(*a)--;
+			break;
+		}
+		else
+			*a = 9;
+	
+	//shifted p3 -= p1
+	//a = shifted p3, b = p1
+	a = buf1 + (power >> 1);
+	b = t1;
+	carry = 0;
+	for (unsigned long int i(0); i < (nh << 1); i++)
+	{
+		sum = 10 + a[i] - (b[i] + carry);
+		if (sum < 10)	//carry
+		{
+			a[i] = sum;
+			carry = 1;
+		}
+		else
+		{
+			a[i] = sum % 10;
+			carry = 0;
+		}
+	}
+	a = &a[nh << 1];
+	for (; carry && a < t1; a++)
+		if (*a)
+		{
+			(*a)--;
+			break;
+		}
+		else
+			*a = 9;
+	
+	//shifted p3 += shifted p1
+	//a = p3[power], b = p1
+	a = buf1 + power;
+	carry = 0;
+	for (unsigned long int i(0); i < (nh << 1); i++)
+	{
+		a[i] = a[i] + b[i] + carry;
+		carry = a[i] / 10;
+		a[i] %= 10;
+	}
+	
+	//p3 += p2
+	//a = p3, b = p2
+	a = buf1;
+	b += (nh << 1);
+	carry = 0;
+	for (unsigned long int i(0); i < (nl << 1); i++)
+	{
+		a[i] = a[i] + b[i] + carry;
+		carry = a[i] / 10;
+		a[i] %= 10;
+	}
+	a += (nl << 1);
+	for (unsigned long int i(0); carry; i++)
+	{
+		a[i] += 1;
+		carry = a[i] / 10;
+		a[i] %= 10; 
+	}
 }
 
 //divides two BigInt numbers
@@ -358,18 +456,10 @@ BigInt::BigInt(unsigned long int intNum) : digits(0)
 	//first save them in a temporary unsigned char[], and later copy them
 	unsigned char tempDigits[40] = {0};
 
-	//transform the number from long int to unsigned char[]
-	int i(0);
-	do
-	{
-		//the number is stored in reverse
-		//(i.e. long int 456 is stored as unsigned char[] {[6][5][4]})
-		tempDigits[i++] = intNum % 10;
-		intNum /= 10;
-	} while (intNum > 0);
+	unsigned long int numLength = intToUChar(intNum, tempDigits);
 
-	length = (int)(i * factor + 1);
-	digitCount = i;
+	length = (unsigned long int)(numLength * factor + 1);
+	digitCount = numLength;
 
 	try
 	{
@@ -713,35 +803,44 @@ BigInt operator*(	const BigInt &leftNum,
 		return BigIntZero;
 		
 	int n(	(leftNum.digitCount < rightNum.digitCount ? 
-			rightNum.digitCount : leftNum.digitCount) + 2);
+			rightNum.digitCount : leftNum.digitCount));
 			
 	//we will use a temporary buffer for multiplication
-	unsigned char *buf1(0);
+	unsigned char *a(0);
 	
 	try
 	{
-		buf1 = new unsigned char[6 * n];
+		a = new unsigned char[100 * n];
 	}
 	catch (...)
 	{
-		delete[] buf1;
+		delete[] a;
 		throw "Error 09: Not enough memory?";
 	}
 	
-	unsigned char *b(buf1 + n), *c(b + n);
+	unsigned char *b(a + n), *buf1(b + n);
 	
-	std::copy(leftNum.digits, leftNum.digits + leftNum.digitCount, buf1);
-	std::fill(buf1 + leftNum.digitCount, buf1 + n, 0);	
+	std::copy(leftNum.digits, leftNum.digits + leftNum.digitCount, a);
+	std::fill(a + leftNum.digitCount, a + n, 0);	
 	std::copy(rightNum.digits, rightNum.digits + rightNum.digitCount, b);
 	std::fill(b + rightNum.digitCount, b + n, 0);
 	
-	BigInt result(BigInt::multiply(	buf1, n - 2,  
-									b, n - 2, 
-									c));
+	BigInt::multiply(a, b, n, buf1, buf1);
 	
-	delete[] buf1;
+	BigInt bigIntResult;
+	bigIntResult.expandTo((n << 1) + 10);
+	std::copy(buf1, buf1 + (n << 1), bigIntResult.digits);
+	for (unsigned long int i = (n << 1) - 1; i > 0; i--)
+	{
+		if (bigIntResult.digits[i])
+		{
+			bigIntResult.digitCount = i + 1;
+			break;
+		}
+	}
+	delete[] a;
 	
-	return result;
+	return bigIntResult;
 }
 
 /*overloaded *= operator*/

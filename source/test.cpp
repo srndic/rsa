@@ -7,6 +7,7 @@
  * 
  * A collection of test code, used to test the functionality of other classes. 
  * 
+ * //TODO: test SqrtULongMax.Power(2)
  * ****************************************************************************
  */
 
@@ -218,8 +219,36 @@ void TestBigIntFunctions()
 //	if (myNumberA[4] == 0)
 //		cout << "operator[] test failed" << endl; //throws "Error 10: Index out of range.";
 
-	BigInt a(2);
+	BigInt a(2), b(3);
+	test(a * b, 6);
+	a = 10000, b = 10000;
+	test(a * b, "100000000");
+	a = 100000;
+	cout << a * b;
+	test(a * b, "1000000000");
+	a = 1000000;
+	cout << a * b;
+	test(a * b, "10000000000");
+	a = 2;
+	cout << a.Power(10);
 	test(a.Power(10), 1024);
+	a = 65536; b = 32768;
+	cout << a * b << endl;
+	test(a * b, "2147483648");
+	a = "111111111111"; b = "111111111111";
+	cout << a * b << endl;
+	test(a * b, "12345679012320987654321");
+	a = 65536; b = 65536;
+	cout << a * b << endl;
+	test(a * b, "4294967296");
+	a = "67296"; b = "83648";
+	cout << a * b;
+	test(a * b, "5629175808");
+	a = "4294967296"; b = "2147483648";
+	cout << a * b;
+	test(a * b, "9223372036854775808");
+	a = 2;
+	cout << a.Power(63) << endl;
 	test(a.Power(63), "9223372036854775808");
 	test(a.Power(64), "18446744073709551616");
 	test(a.Power(71), "2361183241434822606848");

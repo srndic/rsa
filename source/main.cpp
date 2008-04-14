@@ -24,19 +24,19 @@ int main(int argc, char *argv[])
 	try
 	{
 		/*CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT AND STREAM OUTPUT OPERATOR TEST*/
-		TestBigIntFunctions();
+//		TestBigIntFunctions();
 		/*				ARITHMETIC AND COMPARISON OPERATOR TEST	*/
-		TestBigIntOperators();
+//		TestBigIntOperators();
 		/*				FACTORIAL COMPUTATION BENCHMARK			*/
 		FactorialBenchmark();
 		/*				climits INFORMATION						*/
 //		LimitsInfo();
 		/*				RANDOM TEST GENERATOR					*/
-		RandomBigIntTest(1);
+//		RandomBigIntTest(1);
 		/*				RANDOM DIVISION TEST GENERATOR			*/
-		RandomBigIntDivisionTest(5);
+//		RandomBigIntDivisionTest(1);
 /*				PRIME GENERATOR TEST					*/
-		TestPrimeGenerator(1);
+//		TestPrimeGenerator(1);
 
 		pauseScreen();
 	}

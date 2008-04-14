@@ -109,15 +109,16 @@ void test(bool a, bool b)
 		cout << "\t\tTEST OK!" << endl;
 }
 
-BigInt factorial(const BigInt &n)
+BigInt factorial(unsigned long int n)
 {
-	if (n != BigIntOne)
-		return n * factorial(n - BigIntOne);
-	else
-		return BigIntOne;
+	BigInt fact(1);
+	for (BigInt i(1); i <= n; i++)
+		fact = fact * i;
+		
+	return fact;
 }
 
-void factorialTimeTest(int n, const char *factorialOfN)
+void factorialTimeTest(unsigned long int n, const char *factorialOfN)
 {
 	std::clock_t startTime(std::clock()), finishTime;
 	BigInt a(factorial(n));

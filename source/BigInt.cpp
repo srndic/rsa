@@ -113,8 +113,7 @@ int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,
 //multiplies two unsigned char []
 //we use the Divide and Conquer a.k.a. Karatsuba algorithm
 void BigInt::multiply(	unsigned char *a, unsigned char *b,
-						unsigned long int n,   
-						unsigned char *buf1, unsigned char *result)
+						unsigned long int n, unsigned char *buf1)
 {
 	//if *a <= SqrtULongMax && *b <= SqrtULongMax, 
 	//the CPU can do the multiplication
@@ -125,111 +124,98 @@ void BigInt::multiply(	unsigned char *a, unsigned char *b,
 		return;
 	}
 
-	//nh <= nl
-	unsigned long int 	nh(n >> 1), nl(n - nh), nt(nl + 1);
+	//nh = higher half digits, nl = lower half digits
+	//nh == nl || nh + 1 == nl
+	//nt is used to avoid too much nl + 1 addition operations 
+	unsigned long int 	nh(n >> 1), nl(n - nh), nt(nl + 1);	
+	//t1 is a temporary pointer, points to p1
 	unsigned char *t1(buf1 + (n << 1));
 	
 	BigInt::add(a + nl, nh, a, nl, buf1, nt);
 	BigInt::add(b + nl, nh, b, nl, buf1 + nt, nt);
-	BigInt::multiply(a + nl, b + nl, nh, t1, t1);	//p1
-	BigInt::multiply(a, b, nl, t1 + (nh << 1), t1 + (nh << 1));		//p2
-	BigInt::multiply(buf1, buf1 + nt, nt, t1 + (n << 1), t1 + (n << 1));//p3
+	BigInt::multiply(a + nl, b + nl, nh, t1);	//p1
+	BigInt::multiply(a, b, nl, t1 + (nh << 1));		//p2
+	BigInt::multiply(buf1, buf1 + nt, nt, t1 + (n << 1));//p3
 	
+	//for leftshifting p3 and p1
 	unsigned long int power(n);
 	if (power & 1)
 		power++;
-	//copy and shift left p3 by power / 2 and pad right to n * 2 with zeroes
+	//since the original multiplier is not needed any more, we can reuse a
 	a = buf1 + (power >> 1);
+	//copy and shift left p3 by power / 2 and pad right to n * 2 with zeroes
 	std::fill(buf1, a, 0);
 	std::copy(t1 + (n << 1), t1 + ((n + nl) << 1) + 1, a);
 	std::fill(a + (nl << 1) + 1, t1, 0);
 	
 	//shifted p3 -= p2
 	//a == shifted p3, b == p2
-	b = t1 + (nh << 1);
-	unsigned char carry(0), sum(0);
-	for (unsigned long int i(0); i < (nl << 1); i++)
-	{
-		sum = 10 + a[i] - (b[i] + carry);
-		if (sum < 10)	//carry
-		{
-			a[i] = sum;
-			carry = 1;
-		}
-		else
-		{
-			a[i] = sum % 10;
-			carry = 0;
-		}
-	}
-	a = &a[nl << 1];
-	for (; carry && a < t1; a++)
-		if (*a)
-		{
-			(*a)--;
-			break;
-		}
-		else
-			*a = 9;
+	BigInt::quickSub(a, t1 + (nh << 1), t1, nl);
 	
 	//shifted p3 -= p1
 	//a = shifted p3, b = p1
-	a = buf1 + (power >> 1);
-	b = t1;
-	carry = 0;
-	for (unsigned long int i(0); i < (nh << 1); i++)
-	{
-		sum = 10 + a[i] - (b[i] + carry);
-		if (sum < 10)	//carry
-		{
-			a[i] = sum;
-			carry = 1;
-		}
-		else
-		{
-			a[i] = sum % 10;
-			carry = 0;
-		}
-	}
-	a = &a[nh << 1];
-	for (; carry && a < t1; a++)
-		if (*a)
-		{
-			(*a)--;
-			break;
-		}
-		else
-			*a = 9;
+	BigInt::quickSub(a, t1, t1, nh);
 	
 	//shifted p3 += shifted p1
 	//a = p3[power], b = p1
 	a = buf1 + power;
-	carry = 0;
-	for (unsigned long int i(0); i < (nh << 1); i++)
-	{
-		a[i] = a[i] + b[i] + carry;
-		carry = a[i] / 10;
-		a[i] %= 10;
-	}
+	BigInt::quickAdd(a, t1, nh);
 	
 	//p3 += p2
 	//a = p3, b = p2
-	a = buf1;
-	b += (nh << 1);
-	carry = 0;
-	for (unsigned long int i(0); i < (nl << 1); i++)
-	{
-		a[i] = a[i] + b[i] + carry;
-		carry = a[i] / 10;
-		a[i] %= 10;
-	}
-	a += (nl << 1);
+	unsigned char carry = BigInt::quickAdd(buf1, t1 + (nh << 1), nl);
+	a = buf1 + (nl << 1);
 	for (unsigned long int i(0); carry; i++)
 	{
 		a[i] += 1;
 		carry = a[i] / 10;
 		a[i] %= 10; 
 	}
+}
+
+//simple addition, used by the multiply function
+//returns the remaining carry
+unsigned char BigInt::quickAdd(	unsigned char *a, unsigned char *b, 
+								unsigned long int n)
+{
+	unsigned char carry(0), sum(0);
+	for (unsigned long int i(0); i < (n << 1); i++)
+	{
+		sum = a[i] + b[i] + carry;
+		carry = sum / 10;
+		a[i] = sum % 10;
+	}
+	return carry;
+}
+
+//simple subtraction, used by the multiply function
+void BigInt::quickSub(	unsigned char *a, unsigned char *b, 
+						unsigned char *end, unsigned long int n)
+{
+	unsigned char carry(0), sum(0);
+	for (unsigned long int i(0); i < (n << 1); i++)
+	{
+		sum = 10 + a[i] - (b[i] + carry);
+		if (sum < 10)	//carry
+		{
+			a[i] = sum;
+			carry = 1;
+		}
+		else
+		{
+			a[i] = sum % 10;
+			carry = 0;
+		}
+	}
+	a = &a[n << 1];
+	for (; carry && a < end; a++)
+		if (*a)
+		{
+			(*a)--;
+			break;
+		}
+		else
+			*a = 9;
 }
 
 //divides two BigInt numbers
@@ -810,7 +796,7 @@ BigInt operator*(	const BigInt &leftNum,
 	
 	try
 	{
-		a = new unsigned char[100 * n];
+		a = new unsigned char[11 * n];
 	}
 	catch (...)
 	{
@@ -825,7 +811,7 @@ BigInt operator*(	const BigInt &leftNum,
 	std::copy(rightNum.digits, rightNum.digits + rightNum.digitCount, b);
 	std::fill(b + rightNum.digitCount, b + n, 0);
 	
-	BigInt::multiply(a, b, n, buf1, buf1);
+	BigInt::multiply(a, b, n, buf1);
 	
 	BigInt bigIntResult;
 	bigIntResult.expandTo((n << 1) + 10);

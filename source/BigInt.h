@@ -122,8 +122,14 @@ class BigInt
 		                            unsigned char *b, unsigned long int nb);
 		//multiplies two unsigned char[]
 		static void multiply(	unsigned char *a, unsigned char *b,
-								unsigned long int n,   
-								unsigned char *buf1, unsigned char *result);
+								unsigned long int n, unsigned char *buf1);
+		//simple addition, used by the multiply function
+		//returns the remaining carry
+		static unsigned char quickAdd(	unsigned char *a, unsigned char *b, 
+										unsigned long int n);
+		//simple subtraction, used by the multiply function
+		static void quickSub(	unsigned char *a, unsigned char *b, 
+								unsigned char *end, unsigned long int n);
 		//divides two BigInt numbers
 		static void divide(	const BigInt &dividend, const BigInt &divisor,
 							BigInt &quotient, BigInt &remainder);

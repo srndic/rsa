@@ -106,6 +106,11 @@ class BigInt
 		//multiplication factor for the length property
 		//when creating or copying objects
 		static const double factor;
+		//transforms the number from unsigned long int to unsigned char[]
+		//and pads the result with zeroes
+		static unsigned long int intToUChar(unsigned long int number, 
+											unsigned char *digits, 
+											unsigned long int padding);
 		//converts ascii digits to equivalent unsigned char numeric values
 		static void char2uchar(	unsigned char *array, 
 								unsigned long int length);
@@ -116,9 +121,9 @@ class BigInt
 		static int compareNumbers(	unsigned char *a, unsigned long int na,
 		                            unsigned char *b, unsigned long int nb);
 		//multiplies two unsigned char[]
-		static BigInt multiply(	unsigned char *a, unsigned long int na, 
-								unsigned char *b, unsigned long int nb, 
-								unsigned char *buf1);
+		static void multiply(	unsigned char *a, unsigned char *b,
+								unsigned long int n,   
+								unsigned char *buf1, unsigned char *result);
 		//divides two BigInt numbers
 		static void divide(	const BigInt &dividend, const BigInt &divisor,
 							BigInt &quotient, BigInt &remainder);

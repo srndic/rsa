@@ -30,7 +30,7 @@
  * capacity of the digits array to accomodate potential newcomer digits. 
  * When assigning a BigInt a that is twice as small or bigger than *this, 
  * the length is set to (a.length + 2). 
- * I'm not sure there can be no memory leaks. 
+ * There are no memory leaks. 
  * 
  * BigInt supports: 
  * 
@@ -121,8 +121,14 @@ class BigInt
 		static int compareNumbers(	unsigned char *a, unsigned long int na,
 		                            unsigned char *b, unsigned long int nb);
 		//multiplies two unsigned char[]
-		static void multiply(	unsigned char *a, unsigned char *b,
-								unsigned long int n, unsigned char *buf1);
+		//we use the Divide and Conquer a.k.a. Karatsuba algorithm
+		static void karatsubaMultiply(	unsigned char *a, unsigned char *b,
+										unsigned long int n, 
+										unsigned char *buffer);
+		//multiplies two unsigned char[] the long way
+		static void longMultiply(	unsigned char *a, unsigned long int na,
+									unsigned char *b, unsigned long int nb,
+									unsigned char *result);
 		//simple addition, used by the multiply function
 		//returns the remaining carry
 		static unsigned char quickAdd(	unsigned char *a, unsigned char *b, 

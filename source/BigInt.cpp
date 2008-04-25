@@ -112,7 +112,7 @@ int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,
 
 //multiplies two unsigned char []
 //we use the Divide and Conquer a.k.a. Karatsuba algorithm
-void BigInt::multiply(	unsigned char *a, unsigned char *b,
+void BigInt::karatsubaMultiply(	unsigned char *a, unsigned char *b,
 						unsigned long int n, unsigned char *buf1)
 {
 	//if *a <= SqrtULongMax && *b <= SqrtULongMax, 
@@ -133,9 +133,9 @@ void BigInt::multiply(	unsigned char *a, unsigned char *b,
 	
 	BigInt::add(a + nl, nh, a, nl, buf1, nt);
 	BigInt::add(b + nl, nh, b, nl, buf1 + nt, nt);
-	BigInt::multiply(a + nl, b + nl, nh, t1);	//p1
-	BigInt::multiply(a, b, nl, t1 + (nh << 1));		//p2
-	BigInt::multiply(buf1, buf1 + nt, nt, t1 + (n << 1));//p3
+	BigInt::karatsubaMultiply(a + nl, b + nl, nh, t1);	//p1
+	BigInt::karatsubaMultiply(a, b, nl, t1 + (nh << 1));		//p2
+	BigInt::karatsubaMultiply(buf1, buf1 + nt, nt, t1 + (n << 1));//p3
 	
 	//for leftshifting p3 and p1
 	unsigned long int power(n);
@@ -170,6 +170,31 @@ void BigInt::multiply(	unsigned char *a, unsigned char *b,
 		a[i] += 1;
 		carry = a[i] / 10;
 		a[i] %= 10; 
+	}
+}
+
+//multiplies two unsigned char[] the long way
+void BigInt::longMultiply(	unsigned char *a, unsigned long int na,
+							unsigned char *b, unsigned long int nb,
+							unsigned char *result)
+{
+	std::fill_n(result, na + nb, 0);
+	unsigned char mult(0);
+	int carry(0);
+	
+	for (unsigned long int i(0); i < na; i++)
+	{
+		for (unsigned long int j(0); j < nb; j++)
+		{
+			mult = a[i] * b[j] + result[i + j] + carry;
+			result[i + j] = static_cast<int>(mult) % 10;
+			carry = static_cast<int>(mult) / 10;
+		}
+		if (carry)
+		{
+			result[i + nb] += carry;
+			carry = 0;
+		}
 	}
 }
 
@@ -223,6 +248,7 @@ void BigInt::divide(const BigInt &dividend, const BigInt &divisor,
 					BigInt &quotient, BigInt &remainder)
 {
 	BigInt Z1, R, X(dividend);
+	
 	
 	while (X >= divisor)
 	{
@@ -787,36 +813,47 @@ BigInt operator*(	const BigInt &leftNum,
 {
 	if (leftNum.EqualsZero() || rightNum.EqualsZero())
 		return BigIntZero;
-		
+	/*	
 	int n(	(leftNum.digitCount < rightNum.digitCount ? 
 			rightNum.digitCount : leftNum.digitCount));
 			
 	//we will use a temporary buffer for multiplication
-	unsigned char *a(0);
+	unsigned char *buffer(0);
 	
 	try
 	{
-		a = new unsigned char[11 * n];
+		buffer = new unsigned char[11 * n];
 	}
 	catch (...)
 	{
-		delete[] a;
+		delete[] buffer;
 		throw "Error 09: Not enough memory?";
 	}
 	
-	unsigned char *b(a + n), *buf1(b + n);
+	unsigned char *b(buffer + n), *c(b + n);
 	
-	std::copy(leftNum.digits, leftNum.digits + leftNum.digitCount, a);
-	std::fill(a + leftNum.digitCount, a + n, 0);	
+	std::copy(leftNum.digits, leftNum.digits + leftNum.digitCount, buffer);
+	std::fill(buffer + leftNum.digitCount, buffer + n, 0);	
 	std::copy(rightNum.digits, rightNum.digits + rightNum.digitCount, b);
 	std::fill(b + rightNum.digitCount, b + n, 0);
 	
-	BigInt::multiply(a, b, n, buf1);
+	BigInt::karatsubaMultiply(buffer, b, n, c);
+	
+	n <<= 1;*/
+	
+	int n = leftNum.digitCount + rightNum.digitCount;
+	
+	unsigned char *buffer = new unsigned char[n];
+	
+	BigInt::longMultiply(	leftNum.digits, leftNum.digitCount, 
+							rightNum.digits, rightNum.digitCount, buffer);
+							
+	unsigned char *c(buffer);
 	
 	BigInt bigIntResult;
-	bigIntResult.expandTo((n << 1) + 10);
-	std::copy(buf1, buf1 + (n << 1), bigIntResult.digits);
-	for (unsigned long int i = (n << 1) - 1; i > 0; i--)
+	bigIntResult.expandTo(n + 10);
+	std::copy(c, c + n, bigIntResult.digits);
+	for (unsigned long int i = n - 1; i > 0; i--)
 	{
 		if (bigIntResult.digits[i])
 		{
@@ -824,7 +861,7 @@ BigInt operator*(	const BigInt &leftNum,
 			break;
 		}
 	}
-	delete[] a;
+	delete[] buffer;
 	
 	return bigIntResult;
 }

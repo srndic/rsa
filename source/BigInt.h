@@ -59,7 +59,7 @@
  * 	- comparison 				(==, !=, <, <=, >, >=)
  * 		All of the <, <=, >, >= operators are equally fast. 
  * 
- * 	- exponentiation 			(Power())
+ * 	- exponentiation 			(GetPower())
  * 		For exponentiation, the Exponantiation by squaring 
  * 		(or Square and multiply or Binary exponentiation) algorithm is used. 
  * 		It uses O(log(n)) multiplications and therefore is significantly faster
@@ -200,7 +200,13 @@ class BigInt
 									const BigInt &rightNum);
 		BigInt &operator%=(const BigInt &rightNum);
 		/*returns *this to the power of n*/
-		BigInt Power(unsigned long int n) const;
+		BigInt GetPower(unsigned long int n) const;
+		/* *this = *this to the power of n*/
+		BigInt SetPower(unsigned long int n);
+		/*returns *this to the power of n*/
+		BigInt GetPower(BigInt n) const;
+		/* *this = *this to the power of n*/
+		BigInt SetPower(BigInt n);
 		/*returns the nth digit*/
 		unsigned char operator [](unsigned long int n) const;
 		/*returns the number of digits*/

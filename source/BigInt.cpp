@@ -942,7 +942,7 @@ BigInt &BigInt::operator%=(const BigInt &rightNum)
 
 /* returns *this to the power of n 
  * using the fast Square and Multiply algorithm*/
-BigInt BigInt::Power(unsigned long int n) const
+BigInt BigInt::GetPower(unsigned long int n) const
 {
 	BigInt result(BigIntOne);
 	BigInt base(*this);
@@ -953,13 +953,47 @@ BigInt BigInt::Power(unsigned long int n) const
 		if (n & 1)
 		{
 			result = result * base;
-			n -= 1;
+			n--;
 		}
 		n /= 2;
 		base = base * base;
 	}
 	
 	return result;
+}
+
+/* *this = *this to the power of n*/
+BigInt BigInt::SetPower(unsigned long int n)
+{
+	return *this = (*this).GetPower(n);
+}
+
+/* returns *this to the power of n 
+ * using the fast Square and Multiply algorithm*/
+BigInt BigInt::GetPower(BigInt n) const
+{
+	BigInt result(BigIntOne);
+	BigInt base(*this);
+	
+	while (!n.EqualsZero())
+	{
+		//if n is odd
+		if (n.digits[0] & 1)
+		{
+			result = result * base;
+			n--;
+		}
+		n = n / 2;
+		base = base * base;
+	}
+	
+	return result;
+}
+
+/* *this = *this to the power of n*/
+BigInt BigInt::SetPower(BigInt n)
+{
+	return *this = (*this).GetPower(n);
 }
 
 /*overloaded [] operator, returns the nth digit*/

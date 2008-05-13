@@ -7,7 +7,9 @@
  * 
  * A collection of test code, used to test the functionality of other classes. 
  * 
- * //TODO: test SqrtULongMax.Power(2)
+ * TODO: test SqrtULongMax.GetPower(2)
+ * TODO: test SetPower()
+ * 
  * ****************************************************************************
  */
 
@@ -231,8 +233,8 @@ void TestBigIntFunctions()
 	cout << a * b;
 	test(a * b, "10000000000");
 //	a = 2;
-//	cout << a.Power(10);
-//	test(a.Power(10), 1024);
+//	cout << a.GetPower(10);
+//	test(a.GetPower(10), 1024);
 	a = 65536; b = 32768;
 	cout << b * a << endl;
 	test(a * b, "2147483648");
@@ -249,16 +251,16 @@ void TestBigIntFunctions()
 	cout << a * b;
 	test(a * b, "9223372036854775808");
 	a = 2;
-	cout << a.Power(63) << endl;
-	test(a.Power(63), "9223372036854775808");
-	test(a.Power(64), "18446744073709551616");
-	test(a.Power(71), "2361183241434822606848");
-	test(a.Power(0), "1");
+	cout << a.GetPower(63) << endl;
+	test(a.GetPower(63), "9223372036854775808");
+	test(a.GetPower(64), "18446744073709551616");
+	test(a.GetPower(71), "2361183241434822606848");
+	test(a.GetPower(0), "1");
 	a = "10";
-	cout << (a.Power(6)) << endl;
-	test(a.Power(6), "1000000");
-	cout << (a.Power(200)) << endl;
-	test(a.Power(200), "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+	cout << (a.GetPower(6)) << endl;
+	test(a.GetPower(6), "1000000");
+	cout << (a.GetPower(200)) << endl;
+	test(a.GetPower(200), "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
 	a = "10000000000";
 	cout << a.ToString() << endl;
 	cout << a.Length() << endl;
@@ -597,7 +599,7 @@ unsigned long int myRand(unsigned long int max = RAND_MAX)
 }
 
 /*				TEST CODES:
- * 0; a.Power(int n);
+ * 0; a.GetPower(int n);
  * 1; a < b
  * 2; a <= b
  * 3; a > b
@@ -768,7 +770,7 @@ void RandomBigIntTest(unsigned long int testCount)
 					power = static_cast<unsigned long int>(floor(temp));
 				else
 					power = static_cast<unsigned long int>(ceil(temp));
-				testVerbose(a.Power(n), power);
+				testVerbose(a.GetPower(n), power);
 				break;
 		}
 	}
@@ -803,8 +805,9 @@ void TestPrimeGenerator(unsigned long int testCount)
 	cout << "\n\n\tPRIME GENERATOR TEST\n\n";
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
-	for (unsigned long int i = 1; i < testCount; i++)
-		cout 	<< i << ". " << PrimeGenerator::Generate(i + 5, i + 9) 
+	std::srand(time(NULL));
+	for (unsigned long int i = 1; i <= testCount; i++)
+		cout 	<< i << ". " << PrimeGenerator::Generate(i + 5) 
 				<< endl << endl;
 	
 	cout << "\nPrime generator test finished!" << endl;

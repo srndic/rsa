@@ -19,20 +19,29 @@
 class PrimeGenerator
 {
 	private: 
-		/* Creates an odd BigInt with the specified number of digits*/
-		static BigInt createPrimeCandidate(unsigned long int digitCount);
-		/* Creates an odd BigInt with a value less than top*/
-		static BigInt createPrimeCandidate(BigInt top);
+		/* Generates a random number with digitCount digits.
+		 * Returns it in the number parameter. */
+		static void makeRandom(	BigInt &number, 
+								unsigned long int digitCount);
+		/* Generates a random number with a value less than top.
+		 * Returns it in the number parameter. */
+		static void makeRandom(	BigInt &number, 
+								const BigInt &top);
+		/* Creates an odd BigInt with the specified number of digits. 
+		 * Returns it in the number parameter. */
+		static void makePrimeCandidate(	BigInt &number, 
+											unsigned long int digitCount);
 		/* Tests the primality of the given number using the 
 		 * Miller-Rabin primality test*/
 		static bool isProbablePrime(const BigInt &number);
 		/* Returns true if a is congruent to b with the modulus n, otherwise 
 		 * returns false*/
 		static bool congruenceEquation(	const BigInt &a, 
-										const BigInt &b, const BigInt &n);
+										const BigInt &b, 
+										const BigInt &n);
 	public:
 		/*Returns a probable prime number "digitCount" digits long*/
-		static BigInt Generate(	unsigned long int digitCount);
+		static BigInt Generate(unsigned long int digitCount);
 };
 
 #endif /*PRIMEGENERATOR_H_*/

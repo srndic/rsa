@@ -807,7 +807,7 @@ void TestPrimeGenerator(unsigned long int testCount)
 	
 	std::srand(time(NULL));
 	for (unsigned long int i = 1; i <= testCount; i++)
-		cout 	<< i << ". " << PrimeGenerator::Generate(i + 5) 
+		cout 	<< i << ". " << PrimeGenerator::Generate(i + 15) 
 				<< endl << endl;
 	
 	cout << "\nPrime generator test finished!" << endl;

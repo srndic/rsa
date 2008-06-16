@@ -30,7 +30,7 @@ static const BigInt RandMax(RAND_MAX);
 static const BigInt ULongMax(ULONG_MAX);
 
 /* Generates a random number with digitCount digits.
- * Returns it in the number parameter. */
+ * Returns it by reference in the "number" parameter. */
 void PrimeGenerator::makeRandom(BigInt &number, unsigned long int digitCount)
 {
 	//make sure there is enough space
@@ -58,8 +58,8 @@ void PrimeGenerator::makeRandom(BigInt &number, unsigned long int digitCount)
 	number.digitCount = digitCount;
 }
 
-/* Generates a random number with a value less than top.
- * Returns it in the number parameter. */
+/* Generates a random "number" such as 1 <= "number" < "top".
+ * Returns it by reference in the "number" parameter. */
 void PrimeGenerator::makeRandom(BigInt &number, const BigInt &top)
 {
 	//randomly select the number of digits for the random number
@@ -74,9 +74,9 @@ void PrimeGenerator::makeRandom(BigInt &number, const BigInt &top)
 }
 
 /* Creates an odd BigInt with the specified number of digits. 
- * Returns it in the number parameter. */
+* Returns it by reference in the "number" parameter. */
 void PrimeGenerator::makePrimeCandidate(BigInt &number,
-		unsigned long int digitCount)
+										unsigned long int digitCount)
 {
 	PrimeGenerator::makeRandom(number, digitCount);
 	//make the number odd
@@ -87,9 +87,12 @@ void PrimeGenerator::makePrimeCandidate(BigInt &number,
 		number.digits[number.digitCount - 1] = std::rand() % 10;
 }
 
-/*Tests the primality of the given _odd_ number using the 
- * Miller-Rabin primality test*/
-bool PrimeGenerator::isProbablePrime(const BigInt &number)
+/* Tests the primality of the given _odd_ number using the 
+ * Miller-Rabin probabilistic primality test. Returns true if 
+ * the tested argument "number" is a probable prime with a 
+ * probability of at least 1 - 4^(-k), otherwise false. */
+bool PrimeGenerator::isProbablePrime(	const BigInt &number, 
+										unsigned long int k)
 {
 	//first we need to calculate such a and b, that
 	//number - 1 = 2^a * b, a and b are integers, b is odd
@@ -123,7 +126,9 @@ bool PrimeGenerator::isProbablePrime(const BigInt &number)
 		std::exit(EXIT_FAILURE);
 	}
 
-	for (int i = 0; i < 3; i++)
+	//test with k different possible witnesses to ensure that the probability
+	//that "number" is prime is at least 1 - 4^(-k)
+	for (unsigned long int i = 0; i < k; i++)
 	{
 		//reuse temp to generate a random number, 1 <= temp <= number - 1
 		PrimeGenerator::makeRandom(temp, number);
@@ -166,12 +171,14 @@ bool PrimeGenerator::isWitness(	BigInt candidate,
 	return false; //probable prime
 }
 
-/*Returns a probable prime number "digitCount" digits long*/
-BigInt PrimeGenerator::Generate(unsigned long int digitCount)
+/* Returns a probable prime number "digitCount" digits long, 
+ * with a probability of at least 1 - 4^(-k) that it is prime. */
+BigInt PrimeGenerator::Generate(unsigned long int digitCount, 
+								unsigned long int k)
 {
 	BigInt primeCandidate;
 	PrimeGenerator::makePrimeCandidate(primeCandidate, digitCount);
-	while (!isProbablePrime(primeCandidate))
+	while (!isProbablePrime(primeCandidate, k))
 	{
 		//select the next odd number and try again
 		primeCandidate++;

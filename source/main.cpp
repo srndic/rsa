@@ -27,15 +27,15 @@ int main(int argc, char *argv[])
 	try
 	{
 		/*CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT AND STREAM OUTPUT OPERATOR TEST*/
-		TestBigIntFunctions();
+//		TestBigIntFunctions();
 		/*				ARITHMETIC AND COMPARISON OPERATOR TEST	*/
 		TestBigIntOperators();
 		/*				FACTORIAL COMPUTATION BENCHMARK			*/
-		FactorialBenchmark();
+//		FactorialBenchmark();
 		/*				RANDOM TEST GENERATOR					*/
-		RandomBigIntTest(10);
+//		RandomBigIntTest(10);
 		/*				RANDOM DIVISION TEST GENERATOR			*/
-		RandomBigIntDivisionTest(10);
+//		RandomBigIntDivisionTest(10);
 /*				PRIME GENERATOR TEST					*/
 		TestPrimeGenerator(10);
 

@@ -787,7 +787,8 @@ void RandomBigIntDivisionTest(unsigned long int testCount)
 	for (unsigned long int i(1); i <= testCount; i++)
 	{
 		cout << "Test " << i << endl;
-		BigInt a(myRand()), b(myRand());
+		BigInt a(myRand()), b(myRand()), c(myRand()), d(myRand());
+		a *= c * d;
 		cout << "a = " << a << endl << "b = " << b << endl;
 		cout << "a * b = " << a * b << endl;
 		cout << "a * b / a = ";
@@ -807,7 +808,7 @@ void TestPrimeGenerator(unsigned long int testCount)
 	
 	std::srand(time(NULL));
 	for (unsigned long int i = 1; i <= testCount; i++)
-		cout 	<< i << ". " << PrimeGenerator::Generate(i + 15) 
+		cout 	<< i << ". " << PrimeGenerator::Generate(i + 6) 
 				<< endl << endl;
 	
 	cout << "\nPrime generator test finished!" << endl;

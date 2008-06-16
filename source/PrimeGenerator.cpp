@@ -21,9 +21,13 @@
 
 #include "PrimeGenerator.h"
 #include <cstdlib>	//rand(), srand()
+//TODO: remove this include
+#include <iostream>	//for debugging
 
-//A BigInt number with the value of ULONG_MAX
+//A BigInt number with the value of RAND_MAX
 static const BigInt RandMax(RAND_MAX);
+//A BigInt number with the value of ULONG_MAX
+static const BigInt ULongMax(ULONG_MAX);
 
 /* Generates a random number with digitCount digits.
  * Returns it in the number parameter. */
@@ -63,9 +67,12 @@ void PrimeGenerator::makeRandom(BigInt &number,
 	//randomly select the number of digits for the random number
 	unsigned long int newDigitCount = (rand() % top.digitCount) + 1;
 	makeRandom(number, newDigitCount);
-	//make sure the number is <= top
-	while (number >= top)
+	//make sure the number is < top and not zero
+	while (number >= top || number.EqualsZero())
 		makeRandom(number, newDigitCount);
+	//make sure the leading digit is not zero
+	while (number.digits[number.digitCount - 1] == 0)
+		number.digitCount--;
 }
 
 /* Creates an odd BigInt with the specified number of digits. 
@@ -86,45 +93,60 @@ void PrimeGenerator::makePrimeCandidate(BigInt &number,
  * Miller-Rabin primality test*/
 bool PrimeGenerator::isProbablePrime(const BigInt &number)
 {
+	//first we need to calculate such a and b, that
 	//number - 1 = 2^a * b, a and b are integers, b is odd
 	BigInt numberMinusOne(number - 1);
-	//a ~~ log2(numberMinusOne) == numberMinusOne / log10(2)
-	unsigned long int a(
-			static_cast<unsigned long int>((numberMinusOne.digitCount - 1) /
-					0.301029995663981195213738894724));
-		
-	//temp = 2^a
-	BigInt temp((BigIntOne + BigIntOne).GetPower(a));
-	while ((temp = temp * 2) < numberMinusOne)
-		a++;
+	unsigned long int a(0);
+	BigInt temp(numberMinusOne);
+	BigInt b, quotient;
+	static const BigInt two(BigIntOne + BigIntOne);
 	
-	BigInt b(numberMinusOne / (temp / 2));
-	
-	//reuse temp to generate a random number, temp < number - 1
-	PrimeGenerator::makeRandom(temp, numberMinusOne);
-	temp.SetPower(BigInt::toInt(b.digits, b.digitCount));
-	
-	if (congruenceEquation(temp, BigIntOne, number) || 
-		congruenceEquation(temp, numberMinusOne, number))
-		return true;
-	
-	for (unsigned long int i(0); i < a; i++)
+	while (b.EqualsZero())
 	{
-		temp.SetPower(2);
-		temp = temp % number;
-		if (congruenceEquation(temp, numberMinusOne, number))
-			return true;
+		//temp = quotient * 2 + remainder
+		BigInt::divide(temp, two, quotient, b);
+		temp = quotient;
+		a++;
+	}
+	b = temp * two + b;
+	a--;
+	
+	//do some error checking, just to make sure everything is OK
+	if (numberMinusOne != two.GetPower(a) * b)
+	{
+		//TODO: remove this if
+		std::cout << "number = " << number << std::endl << 
+		"numberMinusOne = " << numberMinusOne << std::endl <<
+		"two.GetPower(a) * b = " << (two.GetPower(a) * b) << std::endl <<
+		"a = " << a << std::endl <<
+		"two.GetPower(a) = " << two.GetPower(a) << std::endl << 
+		"b = " <<  b << std::endl << 
+		"temp = " << temp << std::endl <<
+		"ULongMax = " << ULongMax << std::endl;
+		std::cin >> a;
+		std::exit(EXIT_FAILURE);
 	}
 	
-	return false;
-}
-
-/* Returns true if a is congruent to b with the modulus n, otherwise 
- * returns false*/
-bool PrimeGenerator::congruenceEquation(const BigInt &a, 
-										const BigInt &b, const BigInt &n)
-{
-	return a % n == b % n;
+	//reuse temp to generate a random number, 1 <= temp <= number - 1
+	PrimeGenerator::makeRandom(temp, number);
+	
+	temp.SetPowerMod(b, number);
+	
+	for (unsigned long int i = 0; i < a; i++)
+	{
+		bool maybeWitness(false);
+		if (temp != BigIntOne && temp != numberMinusOne)
+			maybeWitness = true;
+			
+		BigInt::divide(temp * temp, number, quotient, temp);
+		if (maybeWitness && temp == BigIntOne)
+			return false;	//definitely a composite number
+	}
+	
+	if (temp != BigIntOne)
+		return false;	//definitively a composite number
+	
+	return true;	//probable prime
 }
 
 /*Returns a probable prime number "digitCount" digits long*/
@@ -134,6 +156,7 @@ BigInt PrimeGenerator::Generate(unsigned long int digitCount)
 	PrimeGenerator::makePrimeCandidate(primeCandidate, digitCount);
 	while (!isProbablePrime(primeCandidate))
 	{
+		//select the next odd number and try again
 		primeCandidate++;
 		primeCandidate++;
 		if (primeCandidate.digitCount != digitCount)

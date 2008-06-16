@@ -90,7 +90,7 @@
 
 #include <iostream>	//ostream
 #include <cmath>	//sqrt()
-#include <string> //ToString()
+#include <string>	//ToString()
 
 class BigInt
 {
@@ -202,11 +202,13 @@ class BigInt
 		/*returns *this to the power of n*/
 		BigInt GetPower(unsigned long int n) const;
 		/* *this = *this to the power of n*/
-		BigInt SetPower(unsigned long int n);
+		void SetPower(unsigned long int n);
 		/*returns *this to the power of n*/
 		BigInt GetPower(BigInt n) const;
 		/* *this = *this to the power of n*/
-		BigInt SetPower(BigInt n);
+		void SetPower(BigInt n);
+		/* *this = (*this to the power of b) mod n */
+		void SetPowerMod(const BigInt &b, const BigInt &n);
 		/*returns the nth digit*/
 		unsigned char operator [](unsigned long int n) const;
 		/*returns the number of digits*/

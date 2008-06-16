@@ -29,6 +29,7 @@
 #include "BigInt.h"
 #include <cstring>	//strlen()
 #include <climits>	//ULONG_MAX
+#include <vector>	//vector<bool>
 #include <algorithm>    //reverse_copy(), copy(), copy_backward(), 
 						//fill(), fill_n()
 
@@ -248,7 +249,10 @@ void BigInt::divide(const BigInt &dividend, const BigInt &divisor,
 					BigInt &quotient, BigInt &remainder)
 {
 	BigInt Z1, R, X(dividend);
-	
+	quotient.digitCount = 1;
+	quotient.digits[0] = 0;
+	remainder.digitCount = 1;
+	remainder.digits[0] = 0;
 	
 	while (X >= divisor)
 	{
@@ -771,7 +775,6 @@ BigInt operator - (	const BigInt &leftNum,
     else if (overflow)
         result.digits[rDigits]--;
 
-	//TODO: optimize this
     //get rid of the leading zeroes
     for (int i(result.digitCount - 1); i > 0; i--)
         if (result.digits[i] == 0)
@@ -785,7 +788,6 @@ BigInt operator - (	const BigInt &leftNum,
 /*overloaded -- operator, prefix version*/							
 BigInt &BigInt::operator--()
 {
-	//TODO: optimize
 	*this = *this - BigIntOne;
 	return *this;
 }
@@ -793,7 +795,6 @@ BigInt &BigInt::operator--()
 /*overloaded -- operator, postfix version*/							
 BigInt BigInt::operator--(int)
 {
-	//TODO: optimize
 	BigInt temp(*this);
 	*this = *this - BigIntOne;
 	return temp;
@@ -802,7 +803,6 @@ BigInt BigInt::operator--(int)
 /*overloaded -= operator*/
 BigInt &BigInt::operator-=(const BigInt &rightNum)
 {
-	//TODO: optimize
 	*this = *this - rightNum;
 	return *this;	
 }
@@ -963,9 +963,9 @@ BigInt BigInt::GetPower(unsigned long int n) const
 }
 
 /* *this = *this to the power of n*/
-BigInt BigInt::SetPower(unsigned long int n)
+void BigInt::SetPower(unsigned long int n)
 {
-	return *this = (*this).GetPower(n);
+	*this = (*this).GetPower(n);
 }
 
 /* returns *this to the power of n 
@@ -991,9 +991,40 @@ BigInt BigInt::GetPower(BigInt n) const
 }
 
 /* *this = *this to the power of n*/
-BigInt BigInt::SetPower(BigInt n)
+void BigInt::SetPower(BigInt n)
 {
-	return *this = (*this).GetPower(n);
+	*this = (*this).GetPower(n);
+}
+
+/* *this = (*this to the power of b) mod n */
+void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
+{
+	//we will need this value later, since *this is going to change
+	const BigInt a(*this);
+	//temporary variables
+	BigInt bCopy(b), q, r;
+	const BigInt two(BigIntOne + BigIntOne);
+	
+	//first we will find the binary representation of b
+	std::vector<bool> bits(100);
+	while (!bCopy.EqualsZero())
+	{
+		BigInt::divide(bCopy, two, q, r);
+		bCopy = q;
+		if (r.EqualsZero())
+			bits.push_back(false);
+		else
+			bits.push_back(true);
+	}
+	
+	//do the exponentiating
+	*this = BigIntOne;
+	for (int i = bits.size() - 1; i >= 0; i--)
+	{
+		BigInt::divide(*this * *this, n, q, *this);
+		if (bits[i])
+			BigInt::divide(*this * a, n, q, *this);
+	}
 }
 
 /*overloaded [] operator, returns the nth digit*/

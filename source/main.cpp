@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 		/*				RANDOM TEST GENERATOR					*/
 //		RandomBigIntTest(100);
 		/*				RANDOM DIVISION TEST GENERATOR			*/
-//		RandomBigIntDivisionTest(30);
+//		RandomBigIntDivisionTest(3000);
 /*				PRIME GENERATOR TEST					*/
 		TestPrimeGenerator(15);
 

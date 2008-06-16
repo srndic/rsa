@@ -252,6 +252,8 @@ void BigInt::divide(const BigInt &dividend, const BigInt &divisor,
 					BigInt &quotient, BigInt &remainder)
 {
 	BigInt Z1, R, X(dividend);
+	//make sure quotient and remainder are zero
+	//the lack of this check has introduced a bug in a prior version
 	quotient.digitCount = 1;
 	quotient.digits[0] = 0;
 	remainder.digitCount = 1;
@@ -497,7 +499,6 @@ BigInt::BigInt(unsigned long int intNum) : digits(0)
 BigInt::BigInt(const BigInt &rightNumber) : length(rightNumber.length),
 digitCount(rightNumber.digitCount)
 {
-	//TODO: is this good practice?
 	//make sure we have enough space to expand in the future
     if (length <= digitCount + 2)
         length = int(length * factor + 1);
@@ -718,7 +719,6 @@ BigInt BigInt::operator++(int)
 /*overloaded += operator*/
 BigInt &BigInt::operator+=(const BigInt &rightNum)
 {
-	//TODO: optimize
 	*this = *this + rightNum;
 	return *this;
 }

@@ -7,7 +7,7 @@
  * Release date: 14th of March 2008
  * 
  * TODO: add code to demonstrate basic functionality 
- * of BigInt and PrimeGenerator. 
+ * of RSA. 
  * 
  * ****************************************************************************
  */

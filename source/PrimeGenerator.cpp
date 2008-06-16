@@ -130,6 +130,7 @@ bool PrimeGenerator::isProbablePrime(const BigInt &number)
 	//reuse temp to generate a random number, 1 <= temp <= number - 1
 	PrimeGenerator::makeRandom(temp, number);
 	
+	//calculate temp = (temp to the power of b) mod number
 	temp.SetPowerMod(b, number);
 	
 	for (unsigned long int i = 0; i < a; i++)

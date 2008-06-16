@@ -30,7 +30,7 @@ class PrimeGenerator
 		/* Creates an odd BigInt with the specified number of digits. 
 		 * Returns it in the number parameter. */
 		static void makePrimeCandidate(	BigInt &number, 
-											unsigned long int digitCount);
+										unsigned long int digitCount);
 		/* Tests the primality of the given number using the 
 		 * Miller-Rabin primality test*/
 		static bool isProbablePrime(const BigInt &number);

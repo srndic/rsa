@@ -34,6 +34,14 @@ class PrimeGenerator
 		/* Tests the primality of the given number using the 
 		 * Miller-Rabin primality test*/
 		static bool isProbablePrime(const BigInt &number);
+		/* Returns true if "candidate" is a witness for the compositeness
+		 * of "number", false if "candidate" is a strong liar. "exponent" 
+		 * and "squareCount" are used for computation */
+		static bool isWitness(	BigInt candidate, 
+								const BigInt &number, 
+								const BigInt &exponent, 
+								unsigned long int squareCount, 
+								const BigInt &numberMinusOne);
 	public:
 		/*Returns a probable prime number "digitCount" digits long*/
 		static BigInt Generate(unsigned long int digitCount);

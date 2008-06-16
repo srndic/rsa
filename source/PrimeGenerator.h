@@ -6,7 +6,7 @@
  * Author: Nedim Srndic
  * Release date: 14th of March 2008
  * 
- * TODO: add basic functionality.
+ * TODO: write comments
  * 
  * ****************************************************************************
  */

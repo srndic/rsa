@@ -14,15 +14,11 @@
  * 		Represents the largest random unsigned long integer that a particular 
  * 		platform can generate. This is platform-specific. 
  * 	 
- * TODO: comment some uncommented code
- * 
  * ****************************************************************************
  */
 
 #include "PrimeGenerator.h"
 #include <cstdlib>	//rand(), srand()
-//TODO: remove this include
-#include <iostream>	//for debugging
 
 //A BigInt number with the value of RAND_MAX
 static const BigInt RandMax(RAND_MAX);
@@ -111,20 +107,6 @@ bool PrimeGenerator::isProbablePrime(	const BigInt &number,
 	}
 	b = temp * two + b;
 	a--;
-
-	//do some error checking, just to make sure everything is OK
-	if (numberMinusOne != two.GetPower(a) * b)
-	{
-		//TODO: remove this if
-		std::cout << "number = " << number << std::endl << "numberMinusOne = "
-				<< numberMinusOne << std::endl << "two.GetPower(a) * b = "
-				<< (two.GetPower(a) * b) << std::endl << "a = " << a
-				<< std::endl << "two.GetPower(a) = " << two.GetPower(a)
-				<< std::endl << "b = " << b << std::endl << "temp = " << temp
-				<< std::endl << "ULongMax = " << ULongMax << std::endl;
-		std::cin >> a;
-		std::exit(EXIT_FAILURE);
-	}
 
 	//test with k different possible witnesses to ensure that the probability
 	//that "number" is prime is at least 1 - 4^(-k)

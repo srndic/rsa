@@ -7,6 +7,8 @@
  * 
  * This file contains the implementation for the RSA class.
  * 
+ * TODO: finish this. Implement the extended Euclid algorithm
+ * 
  * ****************************************************************************
  */
 

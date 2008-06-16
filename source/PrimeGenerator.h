@@ -34,11 +34,6 @@ class PrimeGenerator
 		/* Tests the primality of the given number using the 
 		 * Miller-Rabin primality test*/
 		static bool isProbablePrime(const BigInt &number);
-		/* Returns true if a is congruent to b with the modulus n, otherwise 
-		 * returns false*/
-		static bool congruenceEquation(	const BigInt &a, 
-										const BigInt &b, 
-										const BigInt &n);
 	public:
 		/*Returns a probable prime number "digitCount" digits long*/
 		static BigInt Generate(unsigned long int digitCount);

@@ -23,6 +23,7 @@
 #include <cstdlib>	//rand(), srand()
 //TODO: remove this include
 #include <iostream>	//for debugging
+
 //A BigInt number with the value of RAND_MAX
 static const BigInt RandMax(RAND_MAX);
 //A BigInt number with the value of ULONG_MAX

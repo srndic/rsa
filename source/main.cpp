@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 		/*				RANDOM DIVISION TEST GENERATOR			*/
 //		RandomBigIntDivisionTest(3000);
 /*				PRIME GENERATOR TEST					*/
-		TestPrimeGenerator(15);
+		TestPrimeGenerator(10);
 
 //		BigInt fact(BigIntOne);
 //		for (BigInt i(BigIntOne); i <= 1000; i++)

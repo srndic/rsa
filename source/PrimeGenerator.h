@@ -20,20 +20,23 @@ class PrimeGenerator
 {
 	private: 
 		/* Generates a random number with digitCount digits.
-		 * Returns it in the number parameter. */
+		 * Returns it by reference in the "number" parameter. */
 		static void makeRandom(	BigInt &number, 
 								unsigned long int digitCount);
-		/* Generates a random number with a value less than top.
-		 * Returns it in the number parameter. */
+		/* Generates a random "number" such as 1 <= "number" < "top".
+		 * Returns it by reference in the "number" parameter. */
 		static void makeRandom(	BigInt &number, 
 								const BigInt &top);
 		/* Creates an odd BigInt with the specified number of digits. 
-		 * Returns it in the number parameter. */
+		* Returns it by reference in the "number" parameter. */
 		static void makePrimeCandidate(	BigInt &number, 
 										unsigned long int digitCount);
-		/* Tests the primality of the given number using the 
-		 * Miller-Rabin primality test*/
-		static bool isProbablePrime(const BigInt &number);
+		/* Tests the primality of the given _odd_ number using the 
+		 * Miller-Rabin probabilistic primality test. Returns true if 
+		 * the tested argument "number" is a probable prime with a 
+		 * probability of at least 1 - 4^(-k), otherwise false.  */
+		static bool isProbablePrime(const BigInt &number, 
+									unsigned long int k);
 		/* Returns true if "candidate" is a witness for the compositeness
 		 * of "number", false if "candidate" is a strong liar. "exponent" 
 		 * and "squareCount" are used for computation */
@@ -43,8 +46,10 @@ class PrimeGenerator
 								unsigned long int squareCount, 
 								const BigInt &numberMinusOne);
 	public:
-		/*Returns a probable prime number "digitCount" digits long*/
-		static BigInt Generate(unsigned long int digitCount);
+		/* Returns a probable prime number "digitCount" digits long, 
+		 * with a probability of at least 1 - 4^(-k) that it is prime. */
+		static BigInt Generate(	unsigned long int digitCount, 
+								unsigned long int k);
 };
 
 #endif /*PRIMEGENERATOR_H_*/

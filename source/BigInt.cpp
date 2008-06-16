@@ -813,7 +813,8 @@ BigInt operator*(	const BigInt &leftNum,
 {
 	if (leftNum.EqualsZero() || rightNum.EqualsZero())
 		return BigIntZero;
-	/*	
+	/*	======= This should be uncommented if Karatsuba multiplication
+	 * is to be used =======
 	int n(	(leftNum.digitCount < rightNum.digitCount ? 
 			rightNum.digitCount : leftNum.digitCount));
 			

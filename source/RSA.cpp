@@ -43,5 +43,17 @@ void RSA::GenerateKeyPair(	Key &privateKey,
 		p = PrimeGenerator::Generate(digitCount, k);
 	}
 	
+	//calculate the modulus of both the public and private keys, n
+	BigInt n(p * q);
+	privateKey.modulus = n;
+	publicKey.modulus = n;
 	
+	//calculate the totient phi
+	BigInt phi((p - 1) * (q - 1));
+	
+	//select a small odd integer e that is coprime with phi
+	//usually 65537 is used, and we will use it too if it is coprime
+	BigInt e("65537");
+	
+//	while (e >= "65537" && )
 }

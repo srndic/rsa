@@ -26,6 +26,9 @@
  * ****************************************************************************
  */
 
+//comment the following line if you want to use long multiplication
+//#define KARATSUBA
+
 #include "BigInt.h"
 #include <cstring>	//strlen()
 #include <climits>	//ULONG_MAX
@@ -813,8 +816,9 @@ BigInt operator*(	const BigInt &leftNum,
 {
 	if (leftNum.EqualsZero() || rightNum.EqualsZero())
 		return BigIntZero;
-	/*	======= This should be uncommented if Karatsuba multiplication
-	 * is to be used =======
+	
+#ifdef KARATSUBA	//this controls wether Karatsuba algorithm 
+					//will be used for multiplication 
 	int n(	(leftNum.digitCount < rightNum.digitCount ? 
 			rightNum.digitCount : leftNum.digitCount));
 			
@@ -840,8 +844,8 @@ BigInt operator*(	const BigInt &leftNum,
 	
 	BigInt::karatsubaMultiply(buffer, b, n, c);
 	
-	n <<= 1;*/
-	
+	n <<= 1;
+#else  
 	int n = leftNum.digitCount + rightNum.digitCount;
 	
 	unsigned char *buffer = new unsigned char[n];
@@ -850,6 +854,7 @@ BigInt operator*(	const BigInt &leftNum,
 							rightNum.digits, rightNum.digitCount, buffer);
 							
 	unsigned char *c(buffer);
+#endif /*KARATSUBA*/
 	
 	BigInt bigIntResult;
 	bigIntResult.expandTo(n + 10);

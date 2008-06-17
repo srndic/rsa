@@ -1002,6 +1002,14 @@ void BigInt::SetPower(BigInt n)
 	*this = (*this).GetPower(n);
 }
 
+/* returns (*this to the power of b) mod n */
+BigInt BigInt::GetPowerMod(const BigInt &b, const BigInt &n)
+{
+	BigInt a(*this);
+	a.SetPowerMod(b, n);
+	return a;
+}
+
 /* *this = (*this to the power of b) mod n */
 void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
 {

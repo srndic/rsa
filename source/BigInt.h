@@ -5,9 +5,9 @@
  * Author: Nedim Srndic
  * Release date: 14th of March 2008
  * 
- * A class representing a big positive integer that cannot be saved in
- * standard C++ integer types (i. e. 2^128 is "just" 39 digits long). 
- * Negative numbers are not supported at this time. 
+ * A class representing a positive or negative integer that may 
+ * be too large to fit in any of the standard C++ integer types 
+ * (i. e. 2^128 is "just" 39 digits long). 
  * The digits are stored in a dinamic array of tipe unsigned char*, 
  * with values from 0 to 9 (not '0' to '9'), so that the CPU can  
  * add/subtract individual digits. 
@@ -28,9 +28,8 @@
  * (soon to be full), new memory is allocated and 
  * length is adjusted to (length * factor + 1). This is done to expand the 
  * capacity of the digits array to accomodate potential newcomer digits. 
- * When assigning a BigInt a that is twice as small or bigger than *this, 
- * the length is set to (a.length + 2). 
- * There are no memory leaks. 
+ * When assigning a BigInt "bInt" that is twice as small or bigger than *this, 
+ * the length is set to (bInt.length + 2). 
  * 
  * BigInt supports: 
  * 
@@ -43,23 +42,28 @@
  * 		performance. 
  * 
  * 	- multiplication 			(*, *=)
- * 		For multiplication, the Square and multiply or Karatsuba algorithm is
- * 		used. It multiplies integers in O(n^log2(3)) complexity. 
- * 		log2(3) is approximately 1.585, so this is significantly faster
- * 		than classical multiplication. I have spent	a lot of time optimizing 
- * 		this. 
+ * 		For multiplication, one can choose between the Square and multiply 
+ * 		or Karatsuba algorithm, or long multiplication at compile time 
+ * 		(this can be done by defining or undefining the macro "KARATSUBA").
+ * 		The Karatsuba algorithm multiplies integers in O(n^log2(3)) 
+ * 		complexity. log2(3) is approximately 1.585, so this should be 
+ * 		significantly faster than long multiplication, if the numbers are 
+ * 		big enough. I haven't tested this too much. Currently, the long 
+ * 		multiplication is better implemented, and runs faster than the 
+ * 		Karatsuba multiplication for numbers shorter than about 100 digits. 
  * 
  * 	- C-style integer division 	(/, /=)
- * 		Division is painfully slow. I hope to speed this up in the future. 
+ * 		Division is pretty slow. I hope to speed this up in the future. 
  * 
  * 	- C-style integer division remainder (%, %=)
- * 		When calculating the remainder, the number is first divided. I hope to
+ * 		When calculating the remainder, the number is first divided. I'm
+ * 		not sure if this can be done any smarter. I hope to
  * 		speed this up in the future. 
  * 
  * 	- comparison 				(==, !=, <, <=, >, >=)
  * 		All of the <, <=, >, >= operators are equally fast. 
  * 
- * 	- exponentiation 			(GetPower())
+ * 	- exponentiation 	(GetPower(), SetPower(), GetPowerMod(), SetPowerMod())
  * 		For exponentiation, the Exponantiation by squaring 
  * 		(or Square and multiply or Binary exponentiation) algorithm is used. 
  * 		It uses O(log(n)) multiplications and therefore is significantly faster
@@ -67,6 +71,8 @@
  * 
  * In addition to mathematical operations, BigInt supports: 
  * 
+ * 	- automatic conversion from const char * and unsigned long int 
+ * 	- safe construction, copying, assignment and destruction 
  * 	- writing to the standard output (operator <<(std::ostream, BigInt))
  * 	- returning nth digit (operator[])
  * 	- returning the number of digits (Length())
@@ -208,6 +214,8 @@ class BigInt
 		BigInt GetPower(BigInt n) const;
 		/* *this = *this to the power of n*/
 		void SetPower(BigInt n);
+		/* returns (*this to the power of b) mod n */
+		BigInt GetPowerMod(const BigInt &b, const BigInt &n);
 		/* *this = (*this to the power of b) mod n */
 		void SetPowerMod(const BigInt &b, const BigInt &n);
 		/*returns the nth digit*/

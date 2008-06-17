@@ -15,10 +15,13 @@
 #define PRIMEGENERATOR_H_
 
 #include "BigInt.h"
+#include "RSA.h"
 
 class PrimeGenerator
 {
-	private: 
+	private:
+		//for optimization purposes
+		friend class RSA;
 		/* Generates a random number with digitCount digits.
 		 * Returns it by reference in the "number" parameter. */
 		static void makeRandom(	BigInt &number, 

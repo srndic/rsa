@@ -110,11 +110,13 @@ class BigInt
 		unsigned long int length;
 		//number of digits
 		unsigned long int digitCount;
+		//sign
+		bool positive;
 		//multiplication factor for the length property
 		//when creating or copying objects
 		static const double factor;
 		//transforms the number from unsigned long int to unsigned char[]
-		//and pads the result with zeroes
+		//and pads the result with zeroes. Returns the number of digits. 
 		static unsigned long int intToUChar(unsigned long int number, 
 											unsigned char *digits, 
 											unsigned long int padding);
@@ -192,6 +194,7 @@ class BigInt
 		BigInt &operator++();
 		BigInt operator++(int);
 		BigInt &operator+=(const BigInt &rightNum);
+		BigInt operator-();
 		friend BigInt operator - (	const BigInt &leftNum,
 									const BigInt &rightNum);
 		BigInt &operator--();

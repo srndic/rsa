@@ -88,12 +88,13 @@ bool BigInt::allCharsAreDigits(	const char *array,
 
 //compares two BigInts
 int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,      
-		                    unsigned char *b, unsigned long int nb)
+		                    unsigned char *b, unsigned long int nb,
+		                    bool aPositive, bool bPositive)
 {
-	if (na < nb || !a.positive && b.positive)
+	if (na < nb || !aPositive && bPositive)
 	//a < b
 	    return 2;
-	else if (na > nb || a.positive && !b.positive)
+	else if (na > nb || aPositive && !bPositive)
 	//a > b
 	    return 1;
 
@@ -117,7 +118,7 @@ int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,
 //multiplies two unsigned char []
 //we use the Divide and Conquer a.k.a. Karatsuba algorithm
 void BigInt::karatsubaMultiply(	unsigned char *a, unsigned char *b,
-						unsigned long int n, unsigned char *buf1)
+								unsigned long int n, unsigned char *buf1)
 {
 	//if *a <= SqrtULongMax && *b <= SqrtULongMax, 
 	//the CPU can do the multiplication
@@ -584,7 +585,7 @@ BigInt &BigInt::operator =(const BigInt &rightNumber)
 /*overloaded left shift operator used for console output*/
 std::ostream &operator <<(std::ostream &cout, const BigInt &number)
 {
-	if (!positive)
+	if (!number.positive)
 		cout << '-';
     for (int i = number.digitCount - 1; i >= 0; i--)
         cout << (int(number.digits[i]));
@@ -597,7 +598,8 @@ bool operator <(const BigInt &leftNum,
 		        const BigInt &rightNum)
 {
 	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount) == 2)
+								rightNum.digits, rightNum.digitCount, 
+								leftNum.positive, rightNum.positive) == 2)
 	    return true;
 	return false;
 }
@@ -607,7 +609,8 @@ bool operator <=(	const BigInt &leftNum,
 		        	const BigInt &rightNum)
 {
 	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount) == 1)
+								rightNum.digits, rightNum.digitCount, 
+								leftNum.positive, rightNum.positive) == 1)
 	    return false;
 	return true;
 }
@@ -617,7 +620,8 @@ bool operator >(const BigInt &leftNum,
 		        const BigInt &rightNum)
 {
 	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount) == 1)
+								rightNum.digits, rightNum.digitCount, 
+								leftNum.positive, rightNum.positive) == 1)
 	    return true;
 	return false;
 }
@@ -627,7 +631,8 @@ bool operator >=(	const BigInt &leftNum,
 		        	const BigInt &rightNum)
 {
 	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount) == 2)
+								rightNum.digits, rightNum.digitCount, 
+								leftNum.positive, rightNum.positive) == 2)
 	    return false;
 	return true;
 }
@@ -637,7 +642,8 @@ bool operator ==(	const BigInt &leftNum,
 		        	const BigInt &rightNum)
 {
 	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount))
+								rightNum.digits, rightNum.digitCount, 
+								leftNum.positive, rightNum.positive))
 	    return false;
 	return true;
 }
@@ -647,7 +653,8 @@ bool operator !=(	const BigInt &leftNum,
 		        	const BigInt &rightNum)
 {
 	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount))
+								rightNum.digits, rightNum.digitCount, 
+								leftNum.positive, rightNum.positive))
 	    return true;
 	return false;
 }

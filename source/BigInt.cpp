@@ -49,10 +49,10 @@ static const BigInt SqrtULongMax
 				(static_cast<unsigned long int>(sqrt(ULONG_MAX)));
 
 //transforms the number from unsigned long int to unsigned char[]
-//and pads the result with zeroes. Returns the number of digits. 
-unsigned long int BigInt::intToUChar(	unsigned long int number, 
-										unsigned char *digits, 
-										unsigned long int padding = 0)
+//and pads the result with zeroes
+unsigned long int BigInt::int2uchar(unsigned long int number, 
+									unsigned char *digits, 
+									unsigned long int padding = 0)
 {
 	int i(0);
 	do
@@ -124,7 +124,7 @@ void BigInt::karatsubaMultiply(	unsigned char *a, unsigned char *b,
 	if (compareNumbers(a, n, SqrtULongMax.digits, SqrtULongMax.digitCount) != 1 &&
 		compareNumbers(b, n, SqrtULongMax.digits, SqrtULongMax.digitCount) != 1)
 	{
-		intToUChar(toInt(a, n) * toInt(b, n), buf1, n << 1);
+		int2uchar(toInt(a, n) * toInt(b, n), buf1, n << 1);
 		return;
 	}
 
@@ -320,10 +320,14 @@ unsigned long int BigInt::toInt(unsigned char *digits, int n)
 	return newInt;
 }
 
-/*returns the sum of two unsigned char* */
-void BigInt::add(	unsigned char *a, unsigned long int na, //shorter
-					unsigned char *b, unsigned long int nb, 
-					unsigned char *result, int nResult)
+/* Saves the sum of two unsigned char* shorter and longer into result. 
+ * It must be nShorter <= nLonger. If doFill == true, it fills the 
+ * remaining free places with zeroes (used in KaratsubaMultiply()). 
+ * Returns true if there was an overflow at the end (meaning that
+ * the result.digitCount was longer.digitCount + 1. */
+bool BigInt::add(unsigned char *shorter, unsigned long int nShorter,
+				unsigned char *longer, unsigned long int nLonger, 
+				unsigned char *result, int nResult, bool doFill)
 {
 	//single digitwise sum and carry
 	unsigned char subSum(0);
@@ -333,27 +337,32 @@ void BigInt::add(	unsigned char *a, unsigned long int na, //shorter
 	unsigned long int i(0);
 	
 	//add the digits
- 	for (; i < na; i++)
+ 	for (; i < nShorter; i++)
  	{
- 	    subSum = b[i] + a[i] + subCarry;
+ 	    subSum = longer[i] + shorter[i] + subCarry;
 		subCarry = subSum / 10;
 		result[i] = subSum % 10;
     }
     
-    for (; i < nb; i++)
+    for (; i < nLonger; i++)
 	{
-	    subSum = b[i] + subCarry;
+	    subSum = longer[i] + subCarry;
 	    subCarry = subSum / 10;
 	    result[i] = subSum % 10;
 	}
 	
+    if (doFill)
+    		std::fill_n(result + i, nResult - i, 0);
+    
 	if (subCarry)
+	{
 		result[i++] = 1;
-	
-	std::fill_n(result + i, nResult - i, 0);
+		return true;
+	}
+	return false;
 }
 
-/*shifts the digits left by n places*/
+/* Shifts the digits n places left. */
 BigInt &BigInt::shiftLeft(unsigned long int n)
 {
 	//if the number is 0, we won't shift it
@@ -368,7 +377,7 @@ BigInt &BigInt::shiftLeft(unsigned long int n)
 	return *this;
 }
 
-/* shifts the digits n places to the right */
+/* Shifts the digits n places right. */
 BigInt &BigInt::shiftRight(unsigned long int n)
 {
 	if (n >= digitCount)
@@ -497,7 +506,7 @@ BigInt::BigInt(unsigned long int intNum) : digits(0)
 	//first save them in a temporary unsigned char[], and later copy them
 	unsigned char tempDigits[40] = {0};
 
-	digitCount = intToUChar(intNum, tempDigits);
+	digitCount = int2uchar(intNum, tempDigits);
 
 	length = (unsigned long int)(digitCount * factor + 1);
 
@@ -647,52 +656,27 @@ bool operator !=(	const BigInt &leftNum,
 BigInt operator + (	const BigInt &leftNum,
 					const BigInt &rightNum)
 {
-	//find the bigger of the operands
-	const BigInt *smaller, *bigger;
+	//find the longer of the operands
+	const BigInt *shorter, *longer;
 	if (leftNum > rightNum)
 	{
-	    smaller = &rightNum;
-	    bigger = &leftNum;
+	    shorter = &rightNum;
+	    longer = &leftNum;
 	}
 	else
 	{
-		smaller = &leftNum;
-		bigger = &rightNum;
+		shorter = &leftNum;
+		longer = &rightNum;
 	}
 
-	BigInt sum(*bigger);
-
-	//single digitwise sum and carry
-	unsigned char subSum(0);
-	unsigned char subCarry(0);
-
-	//add the first smaller->digitCount digits
- 	for (int unsigned long i(0); i < smaller->digitCount; i++)
- 	{
- 	    subSum = sum.digits[i] + smaller->digits[i] + subCarry;
-		subCarry = subSum / 10;
-		sum.digits[i] = subSum % 10;
-    }
-
-    //add a leading zero to the sum, in case there is a carry after all
-    //the digits have been added
-	sum.digits[sum.digitCount] = 0;
-
-    //if there is a carry from the previous digitwise sum then
-    //continue with the process
-	for (	unsigned long int i(smaller->digitCount); 
-			i <= bigger->digitCount || subCarry; i++)
-	{
-	    subSum = sum.digits[i] + subCarry;
-	    subCarry = subSum / 10;
-	    sum.digits[i] = subSum % 10;
-	}
-
-    //if there has been a carry after all the digits have been added
-    //increase the number of digits
-	if (sum.digits[sum.digitCount] > 0)			
-	    sum.digitCount++;
-
+	BigInt sum(*longer);
+	
+	bool overflow = BigInt::add(shorter->digits, shorter->digitCount, 
+								longer->digits, longer->digitCount, 
+								sum.digits, 0, false);
+	if (overflow)
+		sum.digitCount++;
+	
 	return sum;
 }
 
@@ -751,7 +735,7 @@ BigInt BigInt::operator-()
 }
 
 /*overloaded subtraction operator*/
-BigInt operator - (	const BigInt &leftNum,
+BigInt operator-(	const BigInt &leftNum,
 					const BigInt &rightNum)
 {
     //the left operand must be greater or equal to the right one

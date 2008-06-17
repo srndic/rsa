@@ -806,10 +806,35 @@ void TestPrimeGenerator(unsigned long int testCount)
 	cout << "\n\n\tPRIME GENERATOR TEST\n\n";
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
-	std::srand(time(NULL));
 	for (unsigned long int i = 1; i <= testCount; i++)
 		cout 	<< i << ". " << PrimeGenerator::Generate(20, 3) 
 				<< endl << endl;
 	
 	cout << "\nPrime generator test finished!" << endl;
+}
+
+/*				KEY GENERATOR TEST						*/
+void TestKeyGeneration(unsigned long int testCount)
+{
+	cout << "\n\n\tKEY GENERATION TEST\n\n";
+	cout << "Preparing to do " << testCount << " tests." << endl << endl;
+	
+	for (unsigned long int i = 1; i <= testCount; i++)
+	{
+		cout 	<< i << ". " << endl; 
+		KeyPair newKeyPair(RSA::GenerateKeyPair(10));
+		cout << "\tPrivate Key" << endl;
+		cout << "\t\tModulus: \t" 
+		<< newKeyPair.GetPrivateKey().GetModulus() << endl;
+		cout << "\t\tExponent: \t" 
+		<< newKeyPair.GetPrivateKey().GetExponent() << endl << endl;
+		cout << "\tPublic Key" << endl;
+		cout << "\t\tModulus: \t" 
+		<< newKeyPair.GetPublicKey().GetModulus() << endl;
+		cout << "\t\tExponent: \t" 
+		<< newKeyPair.GetPublicKey().GetExponent() << endl;
+		cout << endl << endl;
+	}
+	
+	cout << "\nKey generation test finished!" << endl;
 }

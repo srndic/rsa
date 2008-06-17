@@ -12,8 +12,10 @@
  * ****************************************************************************
  */
 
-#include <cstdlib>	//srand(), time()
+#include <cstdlib>	//srand()
+#include <ctime>	//time()
 #include "RSA.h"
+#include "KeyPair.h"
 #include "PrimeGenerator.h"	//Generate()
 
 /* Returns the greatest common divisor of the two arguments 
@@ -61,8 +63,8 @@ BigInt RSA::solveModularLinearEquation(	const BigInt &a,
 		throw "No solutions!";
 }
 
-/* Generates a public/private key-pair. The keys are retured by 
- * reference, in the respective arguments. The generated keys are 
+/* Generates a public/private key-pair. The keys are retured in a 
+ * KeyPair. The generated keys are 
  * 2 * "digitCount" or 2 * "digitCount - 1 digits long, 
  * and have the probability of at least 1 - 4^(-k) of being prime. 
  * For k = 3, that probability is 98.4375%, 
@@ -72,10 +74,8 @@ BigInt RSA::solveModularLinearEquation(	const BigInt &a,
  * by Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and 
  * Clifford Stein for prime number generation. 
  * */
-void RSA::GenerateKeyPair(	Key &privateKey, 
-							Key &publicKey, 
-							unsigned long int digitCount, 
-							unsigned long int k)
+KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount, 
+								unsigned long int k)
 {
 	//randomize the random number generator
 	std::srand(time(NULL));
@@ -92,8 +92,6 @@ void RSA::GenerateKeyPair(	Key &privateKey,
 	
 	//calculate the modulus of both the public and private keys, n
 	BigInt n(p * q);
-	privateKey.modulus = n;
-	publicKey.modulus = n;
 	
 	//calculate the totient phi
 	BigInt phi((p - 1) * (q - 1));
@@ -113,6 +111,18 @@ void RSA::GenerateKeyPair(	Key &privateKey,
 		PrimeGenerator::makeRandom(e, 5);
 	}
 	
+	//now we have enough information to create the public key
+	//e is the public key exponent, n is the modulus
+	Key publicKey(n, e);
+	
 	//calculate d, de = 1 (mod phi)
 	BigInt d(RSA::solveModularLinearEquation(e, BigIntOne, phi));
+	
+	//we can create the private key
+	//d is the private key exponent, n is the modulus
+	Key privateKey(n, d);
+	
+	//finally, the keypair is created and returned
+	KeyPair newKeyPair(privateKey, publicKey);
+	return newKeyPair;
 }

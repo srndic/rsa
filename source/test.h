@@ -31,5 +31,7 @@ void RandomBigIntTest(unsigned long int testCount);
 void RandomBigIntDivisionTest(unsigned long int testCount);
 /*				PRIME GENERATOR TEST					*/
 void TestPrimeGenerator(unsigned long int testCount);
+/*				KEY GENERATOR TEST						*/
+void TestKeyGeneration(unsigned long int testCount);
 
 #endif /*TEST_H_*/

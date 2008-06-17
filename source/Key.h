@@ -24,8 +24,6 @@
 class Key
 {
 	private:
-		//for optimization purposes
-		friend class RSA;
 		BigInt modulus;
 		BigInt exponent;
 	public:

@@ -19,6 +19,7 @@
 
 #include "PrimeGenerator.h"
 #include <cstdlib>	//rand(), srand()
+#include <ctime>	//time()
 
 //A BigInt number with the value of RAND_MAX
 static const BigInt RandMax(RAND_MAX);
@@ -158,6 +159,7 @@ bool PrimeGenerator::isWitness(	BigInt candidate,
 BigInt PrimeGenerator::Generate(unsigned long int digitCount, 
 								unsigned long int k)
 {
+	std::srand(time(NULL));
 	BigInt primeCandidate;
 	PrimeGenerator::makePrimeCandidate(primeCandidate, digitCount);
 	while (!isProbablePrime(primeCandidate, k))

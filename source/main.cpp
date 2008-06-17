@@ -29,15 +29,17 @@ int main(int argc, char *argv[])
 		/*CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT AND STREAM OUTPUT OPERATOR TEST*/
 //		TestBigIntFunctions();
 		/*				ARITHMETIC AND COMPARISON OPERATOR TEST	*/
-		TestBigIntOperators();
+//		TestBigIntOperators();
 		/*				FACTORIAL COMPUTATION BENCHMARK			*/
 //		FactorialBenchmark();
 		/*				RANDOM TEST GENERATOR					*/
 //		RandomBigIntTest(10);
 		/*				RANDOM DIVISION TEST GENERATOR			*/
 //		RandomBigIntDivisionTest(10);
-/*				PRIME GENERATOR TEST					*/
-		TestPrimeGenerator(10);
+		/*				PRIME GENERATOR TEST					*/
+		TestPrimeGenerator(2);
+		/*				KEY GENERATOR TEST						*/
+		TestKeyGeneration(3);
 
 //		BigInt fact(BigIntOne);
 //		for (BigInt i(BigIntOne); i <= 1000; i++)

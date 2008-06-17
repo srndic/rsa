@@ -20,7 +20,7 @@
 #define RSA_H_
 
 #include <string>
-#include "Key.h"
+#include "KeyPair.h"
 #include "BigInt.h"
 
 class RSA
@@ -51,8 +51,8 @@ class RSA
 		/* Decrypts "cyphertext" using "key". */
 		static const std::string &Decrypt(	const std::string cyphertext, 
 											const Key &key);
-		/* Generates a public/private key-pair. The keys are retured by 
-		 * reference, in the respective arguments. The generated keys are 
+		/* Generates a public/private key-pair. The keys are retured in a 
+		 * KeyPair. The generated keys are 
 		 * 2 * "digitCount" or 2 * "digitCount - 1 digits long, 
 		 * and have the probability of at least 1 - 4^(-k) of being prime. 
 		 * For k = 3, that probability is 98.4375%, 
@@ -62,10 +62,8 @@ class RSA
 		 * by Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and 
 		 * Clifford Stein for prime number generation. 
 		 * */
-		static void GenerateKeyPair(Key &privateKey, 
-									Key &publicKey, 
-									unsigned long int digitCount, 
-									unsigned long int k = 3);
+		static KeyPair GenerateKeyPair(	unsigned long int digitCount, 
+										unsigned long int k = 3);
 };
 
 #endif /*RSA_H_*/

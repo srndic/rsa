@@ -50,9 +50,9 @@ static const BigInt SqrtULongMax
 
 //transforms the number from unsigned long int to unsigned char[]
 //and pads the result with zeroes
-unsigned long int BigInt::intToUChar(	unsigned long int number, 
-										unsigned char *digits, 
-										unsigned long int padding = 0)
+unsigned long int BigInt::int2uchar(unsigned long int number, 
+									unsigned char *digits, 
+									unsigned long int padding = 0)
 {
 	int i(0);
 	do
@@ -124,7 +124,7 @@ void BigInt::karatsubaMultiply(	unsigned char *a, unsigned char *b,
 	if (compareNumbers(a, n, SqrtULongMax.digits, SqrtULongMax.digitCount) != 1 &&
 		compareNumbers(b, n, SqrtULongMax.digits, SqrtULongMax.digitCount) != 1)
 	{
-		intToUChar(toInt(a, n) * toInt(b, n), buf1, n << 1);
+		int2uchar(toInt(a, n) * toInt(b, n), buf1, n << 1);
 		return;
 	}
 
@@ -329,11 +329,8 @@ bool BigInt::add(unsigned char *shorter, unsigned long int nShorter,
 				unsigned char *longer, unsigned long int nLonger, 
 				unsigned char *result, int nResult, bool doFill)
 {
-	//single digitwise sum
-	unsigned char subSum(0);
-
-	//single digitwise carry
-	unsigned char subCarry(0);
+	//single digitwise sum and carry
+	unsigned char subSum(0), subCarry(0);
 
 	//count the digits
 	unsigned long int i(0);
@@ -364,7 +361,7 @@ bool BigInt::add(unsigned char *shorter, unsigned long int nShorter,
 	return false;
 }
 
-/*shifts the digits left by n places*/
+/* Shifts the digits n places left. */
 BigInt &BigInt::shiftLeft(unsigned long int n)
 {
 	//if the number is 0, we won't shift it
@@ -379,7 +376,7 @@ BigInt &BigInt::shiftLeft(unsigned long int n)
 	return *this;
 }
 
-/* shifts the digits n places to the right */
+/* Shifts the digits n places right. */
 BigInt &BigInt::shiftRight(unsigned long int n)
 {
 	if (n >= digitCount)
@@ -486,7 +483,7 @@ BigInt::BigInt(unsigned long int intNum) : digits(0)
 	//first save them in a temporary unsigned char[], and later copy them
 	unsigned char tempDigits[40] = {0};
 
-	unsigned long int numLength = intToUChar(intNum, tempDigits);
+	unsigned long int numLength = int2uchar(intNum, tempDigits);
 
 	length = (unsigned long int)(numLength * factor + 1);
 	digitCount = numLength;
@@ -706,7 +703,7 @@ BigInt &BigInt::operator+=(const BigInt &rightNum)
 }
 
 /*overloaded subtraction operator*/
-BigInt operator - (	const BigInt &leftNum,
+BigInt operator-(	const BigInt &leftNum,
 					const BigInt &rightNum)
 {
     //the left operand must be greater or equal to the right one

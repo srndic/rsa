@@ -115,7 +115,7 @@ class BigInt
 		static const double factor;
 		//transforms the number from unsigned long int to unsigned char[]
 		//and pads the result with zeroes
-		static unsigned long int intToUChar(unsigned long int number, 
+		static unsigned long int int2uchar(	unsigned long int number, 
 											unsigned char *digits, 
 											unsigned long int padding);
 		//converts ascii digits to equivalent unsigned char numeric values
@@ -157,9 +157,10 @@ class BigInt
 					unsigned char *longer, unsigned long int nLonger, 
 					unsigned char *result, int nResult, 
 					bool doFill = true);
-		/*shifts the digits n places to the left*/
+		
+		/* Shifts the digits n places left. */
 		BigInt &shiftLeft(unsigned long int n);
-		/* shifts the digits n places to the right */
+		/* Shifts the digits n places right. */
 		BigInt &shiftRight(unsigned long int n);
 		/*expands the digits* to n*/
 		void expandTo(unsigned long int n);

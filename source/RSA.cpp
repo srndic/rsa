@@ -77,9 +77,6 @@ BigInt RSA::solveModularLinearEquation(	const BigInt &a,
 KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount, 
 								unsigned long int k)
 {
-	//randomize the random number generator
-	std::srand(time(NULL));
-	
 	//generate two random numbers p and q, each "digitCount" digits long
 	BigInt p(PrimeGenerator::Generate(digitCount, k));
 	BigInt q(PrimeGenerator::Generate(digitCount, k));

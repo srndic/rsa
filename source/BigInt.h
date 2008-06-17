@@ -117,7 +117,7 @@ class BigInt
 		static const double factor;
 		//transforms the number from unsigned long int to unsigned char[]
 		//and pads the result with zeroes. Returns the number of digits. 
-		static unsigned long int intToUChar(unsigned long int number, 
+		static unsigned long int int2uchar(	unsigned long int number, 
 											unsigned char *digits, 
 											unsigned long int padding);
 		//converts ascii digits to equivalent unsigned char numeric values
@@ -150,13 +150,19 @@ class BigInt
 							BigInt &quotient, BigInt &remainder);
 		/*returns the value of unsigned char[] as long int*/
 		static unsigned long int toInt(unsigned char *digits, int n);
-		/*returns the sum of two unsigned char[]*/
-		static void add(unsigned char *a, unsigned long int na, 
-						unsigned char *b, unsigned long int nb, 
-						unsigned char *result, int nResult);
-		/*shifts the digits n places to the left*/
+		/* Saves the sum of two unsigned char* shorter and longer into result. 
+		 * It must be nShorter <= nLonger. If doFill == true, it fills the 
+		 * remaining free places with zeroes (used in KaratsubaMultiply()). 
+		 * Returns true if there was an overflow at the end (meaning that
+		 * the result.digitCount was longer.digitCount + 1. */
+		static bool add(unsigned char *shorter, unsigned long int nShorter, 
+					unsigned char *longer, unsigned long int nLonger, 
+					unsigned char *result, int nResult, 
+					bool doFill = true);
+		
+		/* Shifts the digits n places left. */
 		BigInt &shiftLeft(unsigned long int n);
-		/* shifts the digits n places to the right */
+		/* Shifts the digits n places right. */
 		BigInt &shiftRight(unsigned long int n);
 		/*expands the digits* to n*/
 		void expandTo(unsigned long int n);

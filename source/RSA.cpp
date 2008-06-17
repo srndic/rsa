@@ -42,7 +42,7 @@ void RSA::extendedEuclideanAlgorithm(	const BigInt &a, const BigInt &b,
 		y = BigIntZero;
 		return;
 	}
-	RSA::extendedEuclideanAlgorithm(a, b, d, x, y);
+	RSA::extendedEuclideanAlgorithm(b, a % b, d, x, y);
 	BigInt temp(x);
 	x = y;
 	y = temp - a / b * y;

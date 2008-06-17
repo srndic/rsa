@@ -128,7 +128,9 @@ class BigInt
 										unsigned long int length);
 		//compares two unsigned char[]
 		static int compareNumbers(	unsigned char *a, unsigned long int na,
-		                            unsigned char *b, unsigned long int nb);
+		                            unsigned char *b, unsigned long int nb, 
+		                            bool aPositive = true, 
+		                            bool bPositive = true);
 		//multiplies two unsigned char[]
 		//we use the Divide and Conquer a.k.a. Karatsuba algorithm
 		static void karatsubaMultiply(	unsigned char *a, unsigned char *b,

@@ -7,7 +7,7 @@
  * 
  * This file contains the implementation for the RSA class.
  * 
- * TODO: finish this. Implement the extended Euclid algorithm
+ * TODO: finish this. Implement the Encrypt and Decrypt methods
  * 
  * ****************************************************************************
  */
@@ -44,6 +44,21 @@ void RSA::extendedEuclideanAlgorithm(	const BigInt &a, const BigInt &b,
 	BigInt temp(x);
 	x = y;
 	y = temp - a / b * y;
+}
+
+/* Solves the equation 
+ * 			ax is congruent to b (mod n), 
+ * given a, b and n finds x. */
+BigInt RSA::solveModularLinearEquation(	const BigInt &a, 
+										const BigInt &b, 
+										const BigInt &n)
+{
+	BigInt p, q, r;
+	RSA::extendedEuclideanAlgorithm(a, n, p, q, r);
+	if ((b % p).EqualsZero())
+		return (q * (b / p)) % n;
+	else
+		throw "No solutions!";
 }
 
 /* Generates a public/private key-pair. The keys are retured by 
@@ -98,5 +113,6 @@ void RSA::GenerateKeyPair(	Key &privateKey,
 		PrimeGenerator::makeRandom(e, 5);
 	}
 	
-	
+	//calculate d, de = 1 (mod phi)
+	BigInt d(RSA::solveModularLinearEquation(e, BigIntOne, phi));
 }

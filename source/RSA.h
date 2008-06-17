@@ -21,18 +21,30 @@
 
 #include <string>
 #include "Key.h"
+#include "BigInt.h"
 
 class RSA
 {
 	private:
-		
+		/* Returns the greatest common divisor of the two arguments 
+		 * "a" and "b", using the Euclidean algorithm. */
+		static BigInt GCD(const BigInt &a, const BigInt &b);
+		/* Solves the equation 
+		 * 			d = ax + by 
+		 * given a and b, and returns d, x and y by reference. 
+		 * It uses the Extended Euclidean Algorithm */
+		static void extendedEuclideanAlgorithm(	const BigInt &a, 
+												const BigInt &b, 
+												BigInt &d, 
+												BigInt &x, 
+												BigInt &y);
 	public:
 		/* Encrypts "message" using "key". */
-		const std::string &Encrypt(	const std::string message, 
-									const Key &key);
+		static const std::string &Encrypt(	const std::string message, 
+											const Key &key);
 		/* Decrypts "cyphertext" using "key". */
-		const std::string &Decrypt(	const std::string cyphertext, 
-									const Key &key);
+		static const std::string &Decrypt(	const std::string cyphertext, 
+											const Key &key);
 		/* Generates a public/private key-pair. The keys are retured by 
 		 * reference, in the respective arguments. The generated keys are 
 		 * 2 * "digitCount" or 2 * "digitCount - 1 digits long, 
@@ -44,10 +56,10 @@ class RSA
 		 * by Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and 
 		 * Clifford Stein for prime number generation. 
 		 * */
-		void GenerateKeyPair(	Key &privateKey, 
-								Key &publicKey, 
-								unsigned long int digitCount, 
-								unsigned long int k = 3);
+		static void GenerateKeyPair(Key &privateKey, 
+									Key &publicKey, 
+									unsigned long int digitCount, 
+									unsigned long int k = 3);
 };
 
 #endif /*RSA_H_*/

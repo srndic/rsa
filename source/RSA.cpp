@@ -16,6 +16,36 @@
 #include "RSA.h"
 #include "PrimeGenerator.h"	//Generate()
 
+/* Returns the greatest common divisor of the two arguments 
+ * "a" and "b", using the Euclidean algorithm. */
+BigInt RSA::GCD(const BigInt &a, const BigInt &b)
+{
+	if (b.EqualsZero())
+		return a;
+	else
+		return RSA::GCD(b, a % b);
+}
+
+/* Solves the equation 
+ * 			d = ax + by 
+ * given a and b, and returns d, x and y by reference. 
+ * It uses the Extended Euclidean Algorithm */
+void RSA::extendedEuclideanAlgorithm(	const BigInt &a, const BigInt &b, 
+										BigInt &d, BigInt &x, BigInt &y)
+{
+	if (b.EqualsZero())
+	{
+		d = a;
+		x = BigIntOne;
+		y = BigIntZero;
+		return;
+	}
+	RSA::extendedEuclideanAlgorithm(a, b, d, x, y);
+	BigInt temp(x);
+	x = y;
+	y = temp - a / b * y;
+}
+
 /* Generates a public/private key-pair. The keys are retured by 
  * reference, in the respective arguments. The generated keys are 
  * 2 * "digitCount" or 2 * "digitCount - 1 digits long, 
@@ -53,9 +83,20 @@ void RSA::GenerateKeyPair(	Key &privateKey,
 	//calculate the totient phi
 	BigInt phi((p - 1) * (q - 1));
 	
-	//select a small odd integer e that is coprime with phi
-	//usually 65537 is used, and we will use it too if it is coprime
+	//we don't want the keys to be less than 20 bits long
+	if (phi < "1048576")
+		throw "Insufficient key strength!";
+	
+	//select a small odd integer e that is coprime with phi and e < phi
+	//usually 65537 is used, and we will use it too if it fits
+	//it is recommended that this be the least possible value for e
 	BigInt e("65537");
 	
-//	while (e >= "65537" && )
+	//make sure the requirements are met
+	while (RSA::GCD(phi, e) != BigIntOne || e < "65537")
+	{
+		PrimeGenerator::makeRandom(e, 5);
+	}
+	
+	
 }

@@ -95,6 +95,7 @@
 class BigInt
 {
 	private:
+		//for optimization purposes
 		friend class PrimeGenerator;
 		//an array of digits stored right to left,
 		//i.e. int 345 = unsigned char {[5], [4], [3]}

@@ -19,11 +19,13 @@
 #define KEY_H_
 
 #include "BigInt.h"
+#include "RSA.h"
 
 class Key
 {
-	friend class RSA;
 	private:
+		//for optimization purposes
+		friend class RSA;
 		BigInt modulus;
 		BigInt exponent;
 	public:

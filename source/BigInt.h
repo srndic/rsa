@@ -148,10 +148,15 @@ class BigInt
 							BigInt &quotient, BigInt &remainder);
 		/*returns the value of unsigned char[] as long int*/
 		static unsigned long int toInt(unsigned char *digits, int n);
-		/*returns the sum of two unsigned char[]*/
-		static void add(unsigned char *a, unsigned long int na, 
-						unsigned char *b, unsigned long int nb, 
-						unsigned char *result, int nResult);
+		/* Saves the sum of two unsigned char* shorter and longer into result. 
+		 * It must be nShorter <= nLonger. If doFill == true, it fills the 
+		 * remaining free places with zeroes (used in KaratsubaMultiply()). 
+		 * Returns true if there was an overflow at the end (meaning that
+		 * the result.digitCount was longer.digitCount + 1. */
+		static bool add(unsigned char *shorter, unsigned long int nShorter, 
+					unsigned char *longer, unsigned long int nLonger, 
+					unsigned char *result, int nResult, 
+					bool doFill = true);
 		/*shifts the digits n places to the left*/
 		BigInt &shiftLeft(unsigned long int n);
 		/* shifts the digits n places to the right */

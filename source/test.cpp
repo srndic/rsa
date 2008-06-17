@@ -375,7 +375,6 @@ void TestBigIntOperators()
 	}
 
 	{
-		//test overloaded - operator 100 times
 	    BigInt a = "1";
 	    BigInt b = "1";
 	
@@ -732,14 +731,14 @@ void RandomBigIntTest(unsigned long int testCount)
 				testVerbose(a -= b, m -= n);
 				break;
 			case 15:
-				m = myRand();	n = myRand(RAND_MAX / m);
+				m = myRand(ULONG_MAX / 2000);	n = myRand(ULONG_MAX / m);
 				a = m;	b = n;
 				cout << "a = " << a << endl << "b = " << b << endl;
 				cout << "TESTING a * b";
 				testVerbose(a * b, m * n);
 				break;
 			case 16:
-				m = myRand();	n = myRand(RAND_MAX / m);
+				m = myRand(ULONG_MAX / 2000);	n = myRand(ULONG_MAX / m);
 				a = m;	b = n;
 				cout << "a = " << a << endl << "b = " << b << endl;
 				cout << "TESTING a *= b";
@@ -806,6 +805,8 @@ void TestPrimeGenerator(unsigned long int testCount)
 	cout << "\n\n\tPRIME GENERATOR TEST\n\n";
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
+	//randomize the random number generator
+	std::srand(time(NULL));
 	for (unsigned long int i = 1; i <= testCount; i++)
 		cout 	<< i << ". " << PrimeGenerator::Generate(20, 3) 
 				<< endl << endl;
@@ -819,6 +820,8 @@ void TestKeyGeneration(unsigned long int testCount)
 	cout << "\n\n\tKEY GENERATION TEST\n\n";
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
+	//randomize the random number generator
+	std::srand(time(NULL));
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
 		cout 	<< i << ". " << endl; 

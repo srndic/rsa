@@ -159,7 +159,6 @@ bool PrimeGenerator::isWitness(	BigInt candidate,
 BigInt PrimeGenerator::Generate(unsigned long int digitCount, 
 								unsigned long int k)
 {
-	std::srand(time(NULL));
 	BigInt primeCandidate;
 	PrimeGenerator::makePrimeCandidate(primeCandidate, digitCount);
 	while (!isProbablePrime(primeCandidate, k))

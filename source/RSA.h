@@ -38,6 +38,12 @@ class RSA
 												BigInt &d, 
 												BigInt &x, 
 												BigInt &y);
+		/* Solves the equation 
+		 * 			ax is congruent to b (mod n), 
+		 * given a, b and n finds x. */
+		static BigInt solveModularLinearEquation(	const BigInt &a, 
+													const BigInt &b, 
+													const BigInt &n);
 	public:
 		/* Encrypts "message" using "key". */
 		static const std::string &Encrypt(	const std::string message, 

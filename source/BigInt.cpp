@@ -49,7 +49,7 @@ static const BigInt SqrtULongMax
 				(static_cast<unsigned long int>(sqrt(ULONG_MAX)));
 
 //transforms the number from unsigned long int to unsigned char[]
-//and pads the result with zeroes
+//and pads the result with zeroes. Returns the number of digits. 
 unsigned long int BigInt::intToUChar(	unsigned long int number, 
 										unsigned char *digits, 
 										unsigned long int padding = 0)
@@ -90,10 +90,10 @@ bool BigInt::allCharsAreDigits(	const char *array,
 int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,      
 		                    unsigned char *b, unsigned long int nb)
 {
-	if (na < nb)
+	if (na < nb || !a.positive && b.positive)
 	//a < b
 	    return 2;
-	else if (na > nb)
+	else if (na > nb || a.positive && !b.positive)
 	//a > b
 	    return 1;
 
@@ -325,10 +325,8 @@ void BigInt::add(	unsigned char *a, unsigned long int na, //shorter
 					unsigned char *b, unsigned long int nb, 
 					unsigned char *result, int nResult)
 {
-	//single digitwise sum
+	//single digitwise sum and carry
 	unsigned char subSum(0);
-
-	//single digitwise carry
 	unsigned char subCarry(0);
 
 	//count the digits
@@ -405,7 +403,7 @@ void BigInt::expandTo(unsigned long int n)
 }
 
 /*Zero params constructor - creates a zero*/
-BigInt::BigInt() : digits(0), length(10), digitCount(1)
+BigInt::BigInt() : digits(0), length(10), digitCount(1), positive(true)
 {
     try
     {
@@ -423,11 +421,29 @@ BigInt::BigInt() : digits(0), length(10), digitCount(1)
 
 /*const char * param constructor - converts a const char * into a BigInt*/
 BigInt::BigInt(const char * charNum) : digits(0)
-{			
+{
 	digitCount = strlen(charNum);
 
 	if (digitCount == 0)
 	    throw "Error 01: Input string empty.";
+	else 
+	{
+		switch (charNum[0])
+		{
+		case '+':
+			digitCount--;
+			charNum++;
+			positive = true;
+			break;
+		case '-':
+			digitCount--;
+			charNum++;
+			positive = false;
+			break;
+		default:
+			positive = true;
+		}
+	}
 
 	//get rid of the leading zeroes
 	while (charNum[0] == '0')
@@ -468,19 +484,22 @@ BigInt::BigInt(const char * charNum) : digits(0)
 /*long int param constructor - converts a long int into a BigInt*/
 BigInt::BigInt(unsigned long int intNum) : digits(0)
 {		
-	//negative numbers not supported
 	if (intNum < 0)
-	    throw "Error 04: Negative input integer.";
+	{
+	    positive = false;
+	    intNum = -intNum;
+	}
+    else
+    	positive = true;
 
 	//we don't know how many digits there are in intNum since
 	//sizeof(long int) is platform dependent (2^128 ~ 39 digits), so we'll
 	//first save them in a temporary unsigned char[], and later copy them
 	unsigned char tempDigits[40] = {0};
 
-	unsigned long int numLength = intToUChar(intNum, tempDigits);
+	digitCount = intToUChar(intNum, tempDigits);
 
-	length = (unsigned long int)(numLength * factor + 1);
-	digitCount = numLength;
+	length = (unsigned long int)(digitCount * factor + 1);
 
 	try
 	{
@@ -497,7 +516,7 @@ BigInt::BigInt(unsigned long int intNum) : digits(0)
 
 /*copy constructor*/
 BigInt::BigInt(const BigInt &rightNumber) : length(rightNumber.length),
-digitCount(rightNumber.digitCount)
+digitCount(rightNumber.digitCount), positive(rightNumber.positive)
 {
 	//make sure we have enough space to expand in the future
     if (length <= digitCount + 2)
@@ -548,6 +567,7 @@ BigInt &BigInt::operator =(const BigInt &rightNumber)
 
 	//copy the values
 	digitCount = rightNumber.digitCount;
+	positive = rightNumber.positive;
 	std::copy(rightNumber.digits, rightNumber.digits + digitCount, digits);
 	return *this;
 }
@@ -555,6 +575,8 @@ BigInt &BigInt::operator =(const BigInt &rightNumber)
 /*overloaded left shift operator used for console output*/
 std::ostream &operator <<(std::ostream &cout, const BigInt &number)
 {
+	if (!positive)
+		cout << '-';
     for (int i = number.digitCount - 1; i >= 0; i--)
         cout << (int(number.digits[i]));
 
@@ -640,10 +662,8 @@ BigInt operator + (	const BigInt &leftNum,
 
 	BigInt sum(*bigger);
 
-	//single digitwise sum
+	//single digitwise sum and carry
 	unsigned char subSum(0);
-
-	//single digitwise carry
 	unsigned char subCarry(0);
 
 	//add the first smaller->digitCount digits
@@ -721,6 +741,13 @@ BigInt &BigInt::operator+=(const BigInt &rightNum)
 {
 	*this = *this + rightNum;
 	return *this;
+}
+
+BigInt BigInt::operator-()
+{
+	BigInt temp(*this);
+	temp.positive = !temp.positive;
+	return temp;
 }
 
 /*overloaded subtraction operator*/

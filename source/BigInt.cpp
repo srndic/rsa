@@ -699,40 +699,14 @@ BigInt operator +(const BigInt &a, const BigInt &b)
 /*overloaded ++ operator, prefix version*/							
 BigInt &BigInt::operator++()
 {
-	//count how many digits we have changed
-	unsigned long int i(0);
-	//increment *this by one
-	for (; i < digitCount; i++)
-	{
-		if (digits[i] == 9)
-			digits[i] = 0;
-		else
-		{
-			digits[i]++;
-			break;
-		}
-	}
-	
-	//if the number was like 99...99
-	if (i == digitCount)
-	{
-		//check if length is too small for a new digit.
-		if (digitCount + 2 >= length)
-			//let's make sure there is enough space for new digits
-			expandTo(digitCount + 2);
-		
-		digitCount++;
-		digits[i] = 1;
-	}
-	
-	return *this;
+	return *this += BigIntOne;
 }
 
 /*overloaded ++ operator, postfix version*/							
 BigInt BigInt::operator++(int)
 {
 	BigInt temp(*this);
-	++(*this);
+	*this += BigIntOne;
 	return temp;
 }
 

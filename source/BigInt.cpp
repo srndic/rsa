@@ -86,7 +86,9 @@ bool BigInt::allCharsAreDigits(	const char *array,
 	return true;
 }
 
-//compares two BigInts
+/* Compares two BigInt. If the last two arguments are 
+ * omitted, the comparison is sign-insensitive (comparison by 
+ * absolute value). */
 int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,      
 		                    unsigned char *b, unsigned long int nb,
 		                    bool aPositive, bool bPositive)
@@ -308,7 +310,7 @@ void BigInt::divide(const BigInt &dividend, const BigInt &divisor,
 	remainder = X;
 }
 
-/*returns the value of unsigned char * as long int*/
+/* Returns the value of the specified unsigned char[] as long int. */
 unsigned long int BigInt::toInt(unsigned char *digits, int n)
 {
 	unsigned long int newInt(0);
@@ -660,22 +662,29 @@ bool operator !=(	const BigInt &leftNum,
 }
 
 /*overloaded addition operator*/
-BigInt operator + (	const BigInt &leftNum,
-					const BigInt &rightNum)
+BigInt operator +(const BigInt &a, const BigInt &b)
 {
+	if (a.positive && !b.positive)
+		return a - (-b);
+	else if (!a.positive && b.positive)
+		return b - (-a);
+	
 	//find the longer of the operands
 	const BigInt *shorter, *longer;
-	if (leftNum > rightNum)
+	if (BigInt::compareNumbers(	a.digits, a.digitCount, 
+								b.digits, b.digitCount) == 1)
 	{
-	    shorter = &rightNum;
-	    longer = &leftNum;
+	    shorter = &b;
+	    longer = &a;
 	}
 	else
 	{
-		shorter = &leftNum;
-		longer = &rightNum;
+		shorter = &a;
+		longer = &b;
 	}
 
+	//Copies the "positive" field too. That is good because now either a and b
+	//are both positive or both negative, so the result has the same sign. 
 	BigInt sum(*longer);
 	
 	bool overflow = BigInt::add(shorter->digits, shorter->digitCount, 
@@ -734,7 +743,7 @@ BigInt &BigInt::operator+=(const BigInt &rightNum)
 	return *this;
 }
 
-BigInt BigInt::operator-()
+BigInt BigInt::operator-() const
 {
 	BigInt temp(*this);
 	temp.positive = !temp.positive;
@@ -1079,4 +1088,10 @@ std::string BigInt::ToString() const
 	std::reverse(bigIntStr.begin(), bigIntStr.end());
 		
 	return bigIntStr;
+}
+
+/* Returns the absolute value. */
+BigInt BigInt::Abs() const
+{
+	return ((this->positive) ? *this : -(*this)); 
 }

@@ -80,6 +80,7 @@
  * 		This can be useful for human-readable output. 
  * 	- returning a value indicating wether the BigInt equals zero (EqualsZero())
  * 		The fastest way to determine this.
+ * 	- returning absolute value (Abs()) 
  * 
  * There are a few static constants defined in this file: 
  * 
@@ -126,7 +127,9 @@ class BigInt
 		//check if all ascii values are digits '0' to '9'
 		static bool allCharsAreDigits(	const char *array, 
 										unsigned long int length);
-		//compares two unsigned char[]
+		/* Compares two BigInt. If the last two arguments are 
+		 * omitted, the comparison is sign-insensitive (comparison by 
+		 * absolute value). */ 
 		static int compareNumbers(	unsigned char *a, unsigned long int na,
 		                            unsigned char *b, unsigned long int nb, 
 		                            bool aPositive = true, 
@@ -150,7 +153,7 @@ class BigInt
 		//divides two BigInt numbers
 		static void divide(	const BigInt &dividend, const BigInt &divisor,
 							BigInt &quotient, BigInt &remainder);
-		/*returns the value of unsigned char[] as long int*/
+		/* Returns the value of the specified unsigned char[] as long int. */
 		static unsigned long int toInt(unsigned char *digits, int n);
 		/* Saves the sum of two unsigned char* shorter and longer into result. 
 		 * It must be nShorter <= nLonger. If doFill == true, it fills the 
@@ -202,7 +205,7 @@ class BigInt
 		BigInt &operator++();
 		BigInt operator++(int);
 		BigInt &operator+=(const BigInt &rightNum);
-		BigInt operator-();
+		BigInt operator-() const;
 		friend BigInt operator - (	const BigInt &leftNum,
 									const BigInt &rightNum);
 		BigInt &operator--();
@@ -235,8 +238,10 @@ class BigInt
 		unsigned long int Length() const;
 		/*returns the value of BigInt as string*/
 		std::string ToString() const;
-		/*returns a value indicating whether *this equals 0*/
+		/* Returns a value indicating whether *this equals 0. */
 		bool EqualsZero() const;
+		/* Returns the absolute value. */
+		BigInt Abs() const;
 };
 
 /*destructor*/

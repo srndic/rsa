@@ -114,6 +114,7 @@ KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount,
 	
 	//calculate d, de = 1 (mod phi)
 	BigInt d(RSA::solveModularLinearEquation(e, BigIntOne, phi));
+	d = d.Abs();
 	
 	//we can create the private key
 	//d is the private key exponent, n is the modulus

@@ -596,67 +596,61 @@ std::ostream &operator <<(std::ostream &cout, const BigInt &number)
 }
 
 /*overloaded < operator*/
-bool operator <(const BigInt &leftNum,
-		        const BigInt &rightNum)
+bool operator <(const BigInt &a, const BigInt &b)
 {
-	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount, 
-								leftNum.positive, rightNum.positive) == 2)
+	if (BigInt::compareNumbers(	a.digits, a.digitCount,
+								b.digits, b.digitCount, 
+								a.positive, b.positive) == 2)
 	    return true;
 	return false;
 }
 
 /*overloaded <= operator*/
-bool operator <=(	const BigInt &leftNum,
-		        	const BigInt &rightNum)
+bool operator <=(const BigInt &a, const BigInt &b)
 {
-	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount, 
-								leftNum.positive, rightNum.positive) == 1)
+	if (BigInt::compareNumbers(	a.digits, a.digitCount,
+								b.digits, b.digitCount, 
+								a.positive, b.positive) == 1)
 	    return false;
 	return true;
 }
 
 /*overloaded > operator*/
-bool operator >(const BigInt &leftNum,
-		        const BigInt &rightNum)
+bool operator >(const BigInt &a, const BigInt &b)
 {
-	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount, 
-								leftNum.positive, rightNum.positive) == 1)
+	if (BigInt::compareNumbers(	a.digits, a.digitCount,
+								b.digits, b.digitCount, 
+								a.positive, b.positive) == 1)
 	    return true;
 	return false;
 }
 
 /*overloaded >= operator*/
-bool operator >=(	const BigInt &leftNum,
-		        	const BigInt &rightNum)
+bool operator >=(const BigInt &a, const BigInt &b)
 {
-	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount, 
-								leftNum.positive, rightNum.positive) == 2)
+	if (BigInt::compareNumbers(	a.digits, a.digitCount,
+								b.digits, b.digitCount, 
+								a.positive, b.positive) == 2)
 	    return false;
 	return true;
 }
 
 /*overloaded == operator*/
-bool operator ==(	const BigInt &leftNum,
-		        	const BigInt &rightNum)
+bool operator ==(const BigInt &a, const BigInt &b)
 {
-	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount, 
-								leftNum.positive, rightNum.positive))
+	if (BigInt::compareNumbers(	a.digits, a.digitCount,
+								b.digits, b.digitCount, 
+								a.positive, b.positive))
 	    return false;
 	return true;
 }
 
 /*overloaded != operator*/
-bool operator !=(	const BigInt &leftNum,
-		        	const BigInt &rightNum)
+bool operator !=(const BigInt &a, const BigInt &b)
 {
-	if (BigInt::compareNumbers(	leftNum.digits, leftNum.digitCount,
-								rightNum.digits, rightNum.digitCount, 
-								leftNum.positive, rightNum.positive))
+	if (BigInt::compareNumbers(	a.digits, a.digitCount,
+								b.digits, b.digitCount, 
+								a.positive, b.positive))
 	    return true;
 	return false;
 }
@@ -711,9 +705,9 @@ BigInt BigInt::operator++(int)
 }
 
 /*overloaded += operator*/
-BigInt &BigInt::operator+=(const BigInt &rightNum)
+BigInt &BigInt::operator+=(const BigInt &number)
 {
-	*this = *this + rightNum;
+	*this = *this + number;
 	return *this;
 }
 
@@ -725,42 +719,61 @@ BigInt BigInt::operator-() const
 }
 
 /*overloaded subtraction operator*/
-BigInt operator-(	const BigInt &leftNum,
-					const BigInt &rightNum)
+BigInt operator-(const BigInt &a, const BigInt &b)
 {
-    //the left operand must be greater or equal to the right one
-    if (leftNum < rightNum)
-        throw "Error 08: Invalid subtraction operands.";
+	if (!a.positive && b.positive)
+	{
+		return -((-a) + b);
+	} 
+	if (a.positive && !b.positive)
+	{
+		return a + (-b);
+	}
 
-    //trivial case
-    if (leftNum == rightNum)
+    const int cmpAbs = BigInt::compareNumbers(	a.digits, a.digitCount, 
+												b.digits, b.digitCount); 
+    //if a == b
+    if ((cmpAbs == 0) && (a.positive == b.positive))
     {
         return BigIntZero;
     }
+    
+    //find the longer of the operands (bigger by absolute value)
+	const BigInt *shorter, *longer;
+	bool sign(a.positive);	//the sign of the result
+	if (cmpAbs != 2)	// a >= b
+	{
+	    shorter = &b;
+	    longer = &a;
+	}
+	else
+	{
+		shorter = &a;
+		longer = &b;
+		sign = !sign;
+	}
 
-    BigInt result(leftNum);
+	BigInt result(*longer);
+	result.positive = sign;
     //temporary variable
-    BigInt rightNumCopy(rightNum);
-
+    const BigInt shorterCopy(*shorter);
     //often used temporary variable
-    int rDigits(rightNumCopy.digitCount);
-
-    //in case of a digitwise carry, overflow = true
+    const int rDigits(shorterCopy.digitCount);
+    //in case of longer digitwise carry, overflow = true
     bool overflow(false);
 
     for (int i(0); i < rDigits; i++)
     {
-        overflow = (leftNum.digits[i] - rightNumCopy.digits[i]) < 0;
-
+        overflow = (longer->digits[i] - shorterCopy.digits[i]) < 0;
         if (overflow)
         {
-            result.digits[i] = leftNum.digits[i] + 10 - rightNumCopy.digits[i];
+            result.digits[i] = longer->digits[i] + 10 - shorterCopy.digits[i];
             //transfer carry
-            rightNumCopy.digits[i+1]++;
+            shorterCopy.digits[i+1]++;
         }
         else
             //make the digitwise subtraction
-            result.digits[i] = leftNum.digits[i] - rightNumCopy.digits[i];
+            result.digits[i] = longer->digits[i] - shorterCopy.digits[i];
     }
 
     //if there is a carry and the following digit is 0 => there will
@@ -774,8 +787,7 @@ BigInt operator-(	const BigInt &leftNum,
             result.digits[i] = 9;
 
         result.digits[i] -= 1;
-    }
-    //there is a carry but there will be no more carries
+    }	//there is a carry but there will be no more carries
     else if (overflow)
         result.digits[rDigits]--;
 
@@ -785,7 +797,7 @@ BigInt operator-(	const BigInt &leftNum,
             result.digitCount--;
         else
             break;
-
+    
     return result;
 }
 
@@ -805,23 +817,21 @@ BigInt BigInt::operator--(int)
 }
 
 /*overloaded -= operator*/
-BigInt &BigInt::operator-=(const BigInt &rightNum)
+BigInt &BigInt::operator-=(const BigInt &number)
 {
-	*this = *this - rightNum;
+	*this = *this - number;
 	return *this;	
 }
 
 /*overloaded multiplication operator*/
-BigInt operator*(	const BigInt &leftNum,
-					const BigInt &rightNum)
+BigInt operator*(const BigInt &a, const BigInt &b)
 {
-	if (leftNum.EqualsZero() || rightNum.EqualsZero())
+	if (a.EqualsZero() || b.EqualsZero())
 		return BigIntZero;
 	
-#ifdef KARATSUBA	//this controls wether Karatsuba algorithm 
-					//will be used for multiplication 
-	int n(	(leftNum.digitCount < rightNum.digitCount ? 
-			rightNum.digitCount : leftNum.digitCount));
+	//this controls wether Karatsuba algorithm will be used for multiplication
+#ifdef KARATSUBA	 
+	int n((a.digitCount < b.digitCount ? b.digitCount : a.digitCount));
 			
 	//we will use a temporary buffer for multiplication
 	unsigned char *buffer(0);
@@ -838,26 +848,28 @@ BigInt operator*(	const BigInt &leftNum,
 	
 	unsigned char *b(buffer + n), *c(b + n);
 	
-	std::copy(leftNum.digits, leftNum.digits + leftNum.digitCount, buffer);
-	std::fill(buffer + leftNum.digitCount, buffer + n, 0);	
-	std::copy(rightNum.digits, rightNum.digits + rightNum.digitCount, b);
-	std::fill(b + rightNum.digitCount, b + n, 0);
+	std::copy(a.digits, a.digits + a.digitCount, buffer);
+	std::fill(buffer + a.digitCount, buffer + n, 0);	
+	std::copy(b.digits, b.digits + b.digitCount, b);
+	std::fill(b + b.digitCount, b + n, 0);
 	
 	BigInt::karatsubaMultiply(buffer, b, n, c);
 	
 	n <<= 1;
 #else  
-	int n = leftNum.digitCount + rightNum.digitCount;
+	int n = a.digitCount + b.digitCount;
 	
 	unsigned char *buffer = new unsigned char[n];
 	
-	BigInt::longMultiply(	leftNum.digits, leftNum.digitCount, 
-							rightNum.digits, rightNum.digitCount, buffer);
+	BigInt::longMultiply(	a.digits, a.digitCount, 
+							b.digits, b.digitCount, buffer);
 							
 	unsigned char *c(buffer);
 #endif /*KARATSUBA*/
 	
-	BigInt bigIntResult;
+	BigInt bigIntResult;	//we assume it's a positive number
+	if (a.positive != b.positive)
+		bigIntResult.positive = false;
 	bigIntResult.expandTo(n + 10);
 	std::copy(c, c + n, bigIntResult.digits);
 	for (unsigned long int i = n - 1; i > 0; i--)
@@ -874,28 +886,25 @@ BigInt operator*(	const BigInt &leftNum,
 }
 
 /*overloaded *= operator*/
-BigInt &BigInt::operator*=(const BigInt &rightNum)
+BigInt &BigInt::operator*=(const BigInt &number)
 {
-	*this = *this * rightNum;
+	*this = *this * number;
 	return *this;
 }
 
 /* overloaded division operator
  * works according to the formula leftNum == Z * rightNum + L*/
-BigInt operator /(	const BigInt &leftNum, 
-					const BigInt &rightNum)
+BigInt operator /(const BigInt &a, const BigInt &b)
 {
-	if (rightNum.EqualsZero())
+	if (b.EqualsZero())
 		throw "Error 12: Attempt to divide by zero.";
 		
 	//we don't want to call this function twice
-	int comparison(BigInt::compareNumbers(	leftNum.digits, 
-											leftNum.digitCount, 
-											rightNum.digits, 
-											rightNum.digitCount));
+	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
+											b.digits, b.digitCount));
 	
-	//if leftNum == 0 or leftNum < rightNum 
-	if (leftNum.EqualsZero() || comparison == 2)
+	//if leftNum == 0 or |leftNum| < |rightNum| 
+	if (a.EqualsZero() || comparison == 2)
 		return BigIntZero;
 
 	//if leftNum == rightNum
@@ -903,29 +912,29 @@ BigInt operator /(	const BigInt &leftNum,
 		return BigIntOne;
 		
 	BigInt quotient, remainder;
-	BigInt::divide(leftNum, rightNum, quotient, remainder);
+	BigInt::divide(a, b, quotient, remainder);
+	//adjust the sign (positive by default)
+	if (a.positive != b.positive)
+		quotient.positive = false;
 	return quotient;
 }
 
 /*overloaded /= operator*/
-BigInt &BigInt::operator /=(const BigInt &rightNum)
+BigInt &BigInt::operator /=(const BigInt &number)
 {
-	*this = *this / rightNum;
+	*this = *this / number;
 	return *this;
 }
 
 /*overloaded remainder operator*/
-BigInt operator%(	const BigInt &leftNum, 
-					const BigInt &rightNum)
+BigInt operator%(const BigInt &a, const BigInt &b)
 {
-	if (rightNum.EqualsZero())
+	if (b.EqualsZero())
 		throw "Error 14: Attempt to divide by zero.";
 		
 	//we don't want to call this function twice
-	int comparison(BigInt::compareNumbers(	leftNum.digits, 
-											leftNum.digitCount, 
-											rightNum.digits, 
-											rightNum.digitCount));
+	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
+											b.digits, b.digitCount));
 	
 	//leftNum == rightNum 
 	if (comparison == 0)
@@ -933,17 +942,17 @@ BigInt operator%(	const BigInt &leftNum,
 
 	//if leftNum < rightNum
 	if (comparison == 2)
-		return leftNum;
+		return a;
 		
 	BigInt quotient, remainder;
-	BigInt::divide(leftNum, rightNum, quotient, remainder);
+	BigInt::divide(a, b, quotient, remainder);
 	return remainder;
 }
 							
 /*overloaded %= operator*/
-BigInt &BigInt::operator%=(const BigInt &rightNum)
+BigInt &BigInt::operator%=(const BigInt &number)
 {
-	*this = *this % rightNum;
+	*this = *this % number;
 	return *this;
 }
 
@@ -966,6 +975,9 @@ BigInt BigInt::GetPower(unsigned long int n) const
 		base = base * base;
 	}
 	
+	//number was negative and the exponent is odd, the result is negative
+	if (!positive && (n & 1))
+		result.positive = false;
 	return result;
 }
 
@@ -994,6 +1006,9 @@ BigInt BigInt::GetPower(BigInt n) const
 		base = base * base;
 	}
 	
+	//number was negative and the exponent is odd, the result is negative
+	if (!positive && (n.digits[0] & 1))
+		result.positive = false;
 	return result;
 }
 
@@ -1004,7 +1019,7 @@ void BigInt::SetPower(BigInt n)
 }
 
 /* returns (*this to the power of b) mod n */
-BigInt BigInt::GetPowerMod(const BigInt &b, const BigInt &n)
+BigInt BigInt::GetPowerMod(const BigInt &b, const BigInt &n) const
 {
 	BigInt a(*this);
 	a.SetPowerMod(b, n);
@@ -1052,15 +1067,19 @@ unsigned char BigInt::operator [](unsigned long int n) const
 }
 
 /*returns the value of BigInt as string*/
-std::string BigInt::ToString() const
+std::string BigInt::ToString(bool forceSign) const
 {
 	std::string bigIntStr(digits, digits + digitCount);
 	
 	for (unsigned long int i(0); i < digitCount; i++)
 		bigIntStr[i] = digits[i] + '0';
-		
+	
+	if (!positive)
+		bigIntStr.append("-");
+	else if (forceSign)
+		bigIntStr.append("+");
+	
 	std::reverse(bigIntStr.begin(), bigIntStr.end());
-		
 	return bigIntStr;
 }
 

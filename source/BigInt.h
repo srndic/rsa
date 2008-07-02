@@ -174,52 +174,41 @@ class BigInt
 	public:
 		/*Zero params constructor - creates a new BigInt with the value of 0*/
 		BigInt();
-		/*const char * param constructor - converts a const char * 
-		 * into a BigInt*/
+		/*const char * param constructor - converts a 
+		 * const char * into a BigInt*/
 		BigInt(const char *charNum);
 		/*long int param constructor - converts a long int into a BigInt*/
 		BigInt(unsigned long int intNum);
 		/*copy constructor*/
-		BigInt(const BigInt &rightNumber);
+		BigInt(const BigInt &number);
 		/*overloaded assignment operator*/
 		BigInt &operator =(const BigInt &rightNumber);
 		/*destructor*/
 		~BigInt();
 		friend std::ostream &operator <<(	std::ostream &cout, 
 											const BigInt &number);
-		friend bool operator <(	const BigInt &leftNum,
-		                        const BigInt &rightNum);
-		friend bool operator <=(const BigInt &leftNum,
-		                        const BigInt &rightNum);
-		friend bool operator >(	const BigInt &leftNum,
-		                        const BigInt &rightNum);
-		friend bool operator >=(const BigInt &leftNum,
-		                        const BigInt &rightNum);
-		friend bool operator ==(const BigInt &leftNum,
-		                        const BigInt &rightNum);
-		friend bool operator !=(const BigInt &leftNum,
-		                        const BigInt &rightNum);
-		friend BigInt operator + (	const BigInt &leftNum,
-									const BigInt &rightNum);
+		friend bool operator <(const BigInt &a, const BigInt &b);
+		friend bool operator <=(const BigInt &a, const BigInt &b);
+		friend bool operator >(const BigInt &a, const BigInt &b);
+		friend bool operator >=(const BigInt &a, const BigInt &b);
+		friend bool operator ==(const BigInt &a, const BigInt &b);
+		friend bool operator !=(const BigInt &a, const BigInt &b);
+		friend BigInt operator + (const BigInt &a, const BigInt &b);
 		BigInt &operator+();
 		BigInt &operator++();
 		BigInt operator++(int);
-		BigInt &operator+=(const BigInt &rightNum);
+		BigInt &operator+=(const BigInt &number);
 		BigInt operator-() const;
-		friend BigInt operator - (	const BigInt &leftNum,
-									const BigInt &rightNum);
+		friend BigInt operator - (const BigInt &a, const BigInt &b);
 		BigInt &operator--();
 		BigInt operator--(int);
-		BigInt &operator-=(const BigInt &rightNum);
-		friend BigInt operator*(	const BigInt &leftNum,
-									const BigInt &rightNum);
-		BigInt &operator*=(const BigInt &rightNum);
-		friend BigInt operator/(	const BigInt &leftNum, 
-									const BigInt &rightNum);
-		BigInt &operator/=(const BigInt &rightNum);
-		friend BigInt operator%(	const BigInt &leftNum, 
-									const BigInt &rightNum);
-		BigInt &operator%=(const BigInt &rightNum);
+		BigInt &operator-=(const BigInt &number);
+		friend BigInt operator*(const BigInt &a, const BigInt &b);
+		BigInt &operator*=(const BigInt &number);
+		friend BigInt operator/(const BigInt &a, const BigInt &b);
+		BigInt &operator/=(const BigInt &number);
+		friend BigInt operator%(const BigInt &a, const BigInt &b);
+		BigInt &operator%=(const BigInt &number);
 		/*returns *this to the power of n*/
 		BigInt GetPower(unsigned long int n) const;
 		/* *this = *this to the power of n*/
@@ -229,7 +218,7 @@ class BigInt
 		/* *this = *this to the power of n*/
 		void SetPower(BigInt n);
 		/* returns (*this to the power of b) mod n */
-		BigInt GetPowerMod(const BigInt &b, const BigInt &n);
+		BigInt GetPowerMod(const BigInt &b, const BigInt &n) const;
 		/* *this = (*this to the power of b) mod n */
 		void SetPowerMod(const BigInt &b, const BigInt &n);
 		/*returns the nth digit*/
@@ -237,7 +226,7 @@ class BigInt
 		/*returns the number of digits*/
 		unsigned long int Length() const;
 		/*returns the value of BigInt as string*/
-		std::string ToString() const;
+		std::string ToString(bool forceSign = false) const;
 		/* Returns a value indicating whether *this equals 0. */
 		bool EqualsZero() const;
 		/* Returns the absolute value. */

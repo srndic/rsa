@@ -9,6 +9,7 @@
  * 
  * TODO: test SqrtULongMax.GetPower(2)
  * TODO: test SetPower()
+ * TODO: test operators on negative numbers
  * 
  * ****************************************************************************
  */
@@ -826,15 +827,15 @@ void TestKeyGeneration(unsigned long int testCount)
 	{
 		cout 	<< i << ". " << endl; 
 		KeyPair newKeyPair(RSA::GenerateKeyPair(10));
-		cout << "\tPrivate Key" << endl;
-		cout << "\t\tModulus: \t" 
+		cout << "Private Key" << endl;
+		cout << "\tModulus: \t" 
 		<< newKeyPair.GetPrivateKey().GetModulus() << endl;
-		cout << "\t\tExponent: \t" 
+		cout << "\tExponent: \t" 
 		<< newKeyPair.GetPrivateKey().GetExponent() << endl << endl;
-		cout << "\tPublic Key" << endl;
-		cout << "\t\tModulus: \t" 
+		cout << "Public Key" << endl;
+		cout << "\tModulus: \t" 
 		<< newKeyPair.GetPublicKey().GetModulus() << endl;
-		cout << "\t\tExponent: \t" 
+		cout << "\tExponent: \t" 
 		<< newKeyPair.GetPublicKey().GetExponent() << endl;
 		cout << endl << endl;
 	}

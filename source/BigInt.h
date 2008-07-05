@@ -102,29 +102,29 @@
 class BigInt
 {
 	private:
-		//for optimization purposes
+		// For optimization purposes
 		friend class PrimeGenerator;
-		//an array of digits stored right to left,
-		//i.e. int 345 = unsigned char {[5], [4], [3]}
+		/* An array of digits stored right to left,
+		* i.e. int 345 = unsigned char {[5], [4], [3]} */
 		unsigned char *digits;
-		//the total length of the allocated memory
+		// The total length of the allocated memory
 		unsigned long int length;
-		//number of digits
+		// Number of digits
 		unsigned long int digitCount;
-		//sign
+		// Sign
 		bool positive;
-		//multiplication factor for the length property
-		//when creating or copying objects
+		/* Multiplication factor for the length property
+		 * when creating or copying objects. */
 		static const double factor;
-		//transforms the number from unsigned long int to unsigned char[]
-		//and pads the result with zeroes. Returns the number of digits. 
+		/* Transforms the number from unsigned long int to unsigned char[]
+		 * and pads the result with zeroes. Returns the number of digits. */
 		static unsigned long int int2uchar(	unsigned long int number, 
 											unsigned char *digits, 
 											unsigned long int padding);
-		//converts ascii digits to equivalent unsigned char numeric values
+		/* Converts ASCII digits to equivalent unsigned char numeric values. */
 		static void char2uchar(	unsigned char *array, 
 								unsigned long int length);
-		//check if all ascii values are digits '0' to '9'
+		/* Check if all ASCII values are digits '0' to '9'. */
 		static bool allCharsAreDigits(	const char *array, 
 										unsigned long int length);
 		/* Compares two BigInt. If the last two arguments are 
@@ -134,23 +134,23 @@ class BigInt
 		                            unsigned char *b, unsigned long int nb, 
 		                            bool aPositive = true, 
 		                            bool bPositive = true);
-		//multiplies two unsigned char[]
-		//we use the Divide and Conquer a.k.a. Karatsuba algorithm
+		/* Multiplies two unsigned char[] using the Divide and Conquer 
+		 * a.k.a. Karatsuba algorithm .*/
 		static void karatsubaMultiply(	unsigned char *a, unsigned char *b,
 										unsigned long int n, 
 										unsigned char *buffer);
-		//multiplies two unsigned char[] the long way
+		/* Multiplies two unsigned char[] the long way. */
 		static void longMultiply(	unsigned char *a, unsigned long int na,
 									unsigned char *b, unsigned long int nb,
 									unsigned char *result);
-		//simple addition, used by the multiply function
-		//returns the remaining carry
+		/* Simple addition, used by the multiply function.
+		 * Returns the remaining carry. */
 		static unsigned char quickAdd(	unsigned char *a, unsigned char *b, 
 										unsigned long int n);
-		//simple subtraction, used by the multiply function
+		/* Simple subtraction, used by the multiply function. */
 		static void quickSub(	unsigned char *a, unsigned char *b, 
 								unsigned char *end, unsigned long int n);
-		//divides two BigInt numbers
+		/* Divides two BigInt numbers. */
 		static void divide(	const BigInt &dividend, const BigInt &divisor,
 							BigInt &quotient, BigInt &remainder);
 		/* Returns the value of the specified unsigned char[] as long int. */
@@ -169,21 +169,14 @@ class BigInt
 		BigInt &shiftLeft(unsigned long int n);
 		/* Shifts the digits n places right. */
 		BigInt &shiftRight(unsigned long int n);
-		/*expands the digits* to n*/
+		/* Expands the digits* to n. */
 		void expandTo(unsigned long int n);
 	public:
-		/*Zero params constructor - creates a new BigInt with the value of 0*/
 		BigInt();
-		/*const char * param constructor - converts a 
-		 * const char * into a BigInt*/
 		BigInt(const char *charNum);
-		/*long int param constructor - converts a long int into a BigInt*/
 		BigInt(unsigned long int intNum);
-		/*copy constructor*/
 		BigInt(const BigInt &number);
-		/*overloaded assignment operator*/
 		BigInt &operator =(const BigInt &rightNumber);
-		/*destructor*/
 		~BigInt();
 		friend std::ostream &operator <<(	std::ostream &cout, 
 											const BigInt &number);
@@ -209,23 +202,25 @@ class BigInt
 		BigInt &operator/=(const BigInt &number);
 		friend BigInt operator%(const BigInt &a, const BigInt &b);
 		BigInt &operator%=(const BigInt &number);
-		/*returns *this to the power of n*/
+		/* Returns *this to the power of n 
+		 * using the fast Square and Multiply algorithm. */
 		BigInt GetPower(unsigned long int n) const;
-		/* *this = *this to the power of n*/
+		/* *this = *this to the power of n. */
 		void SetPower(unsigned long int n);
-		/*returns *this to the power of n*/
+		/* Returns *this to the power of n 
+		 * using the fast Square and Multiply algorithm. */
 		BigInt GetPower(BigInt n) const;
-		/* *this = *this to the power of n*/
+		/* *this = *this to the power of n. */
 		void SetPower(BigInt n);
-		/* returns (*this to the power of b) mod n */
+		/* Returns (*this to the power of b) mod n. */
 		BigInt GetPowerMod(const BigInt &b, const BigInt &n) const;
-		/* *this = (*this to the power of b) mod n */
+		/* *this = (*this to the power of b) mod n. */
 		void SetPowerMod(const BigInt &b, const BigInt &n);
-		/*returns the nth digit*/
+		/* Returns the nth digit. */
 		unsigned char operator [](unsigned long int n) const;
-		/*returns the number of digits*/
+		/* Returns the number of digits*/
 		unsigned long int Length() const;
-		/*returns the value of BigInt as string*/
+		/* Returns the value of BigInt as std::string. */
 		std::string ToString(bool forceSign = false) const;
 		/* Returns a value indicating whether *this equals 0. */
 		bool EqualsZero() const;
@@ -233,7 +228,6 @@ class BigInt
 		BigInt Abs() const;
 };
 
-/*destructor*/
 inline BigInt::~BigInt()
 {
 	delete[] digits;
@@ -244,21 +238,21 @@ inline BigInt &BigInt::operator+()
 	return *this;
 }
 
-/*returns the number of digits*/
+/* Returns the number of digits. */
 inline unsigned long int BigInt::Length() const
 {
 	return digitCount;
 }
 
-/*returns a value indicating whether *this equals 0*/
+/* Returns a value indicating whether *this equals 0. */
 inline bool BigInt::EqualsZero() const
 {
 	return digitCount == 1 && digits[0] == 0;
 }
 		
-//A BigInt number with the value of 0
+// A BigInt number with the value of 0. 
 static const BigInt BigIntZero;
-//A BigInt number with the value of 1
+// A BigInt number with the value of 1. 
 static const BigInt BigIntOne(1);
 
 

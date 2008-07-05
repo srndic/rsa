@@ -33,16 +33,16 @@ int main(int argc, char *argv[])
 		/*				FACTORIAL COMPUTATION BENCHMARK			*/
 		FactorialBenchmark();
 		/*				RANDOM TEST GENERATOR					*/
-		RandomBigIntTest(1);
+		RandomBigIntTest(10);
 		/*				RANDOM DIVISION TEST GENERATOR			*/
-		RandomBigIntDivisionTest(1);
+		RandomBigIntDivisionTest(10);
 		/*				PRIME GENERATOR TEST					*/
 		TestPrimeGenerator(2);
 		/*				KEY GENERATOR TEST						*/
 		TestKeyGeneration(2);
 
 		BigInt fact(BigIntOne);
-		for (BigInt i(BigIntOne); i <= 1000; i++)
+		for (BigInt i(BigIntOne); i <= "1000"; i++)
 			fact = fact * i;
 
 		cout << fact << endl << endl;

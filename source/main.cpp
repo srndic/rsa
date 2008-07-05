@@ -14,6 +14,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <ctime>
 #include "RSA.h"
 #include "BigInt.h"
 #include "PrimeGenerator.h"
@@ -24,6 +25,9 @@ using std::endl;
 
 int main(int argc, char *argv[])
 {
+	//randomize the random number generator
+	std::srand(time(NULL));
+	
 	try
 	{
 		/*CONSTRUCTOR, DESTRUCTOR, ASSIGNMENT AND STREAM OUTPUT OPERATOR TEST*/

@@ -13,6 +13,14 @@
  * 	- Message decryption 
  * 	- Public/private key-pair generation 
  * 
+ * NOTE: it is highly recommended to call 
+ * 		std::srand(time(NULL));
+ * 	once when the program starts and before any use of methods provided by the 
+ * 	RSA class. Calling the srand() function randomizes the standard C++ 
+ * 	pseudorandom number generator, so that it provides different series of 
+ * 	pseudorandom numbers every time the program is run. This greatly improves 
+ * 	security. 
+ * 
  * ****************************************************************************
  */
 

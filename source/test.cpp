@@ -580,8 +580,8 @@ void TestBigIntOperators()
 		a = "232323";
 		test(a /= b, "0");
 		a = "232323";
-		b = "232323";
-		test(a /= b, "1");
+		b = "-232323";
+		test(a /= b, "-1");
 		a = "9";
 		b = 3;
 		test(a /= b, "3");
@@ -590,9 +590,6 @@ void TestBigIntOperators()
 	cout << "\n\n\tOPERATOR %\n\n";
 
 	{
-		//test overloaded % operator 
-		pauseScreen();
-		
 		BigInt a(10), b("0");
 //		test(a % b, "0");	//throws "Error 12: Attempt to divide by zero."
 		a = "0";
@@ -609,6 +606,15 @@ void TestBigIntOperators()
 		test(a % b, "1");
 		a = "11";
 		test(a % b, "2");
+		
+		a = "-10"; b = "-3";
+		test(a % b, 1);
+		b = "3";
+		test(a % b, "1");
+		a = 10;
+		test(a % b, 1);
+		b = "-3";
+		test(a % b, "1");
 	}
 	
 	cout << "\n\n\tOPERATOR %=\n\n";
@@ -626,7 +632,7 @@ void TestBigIntOperators()
 		test(a %= b, "232323");
 		b = "232323";
 		test(a %= b, "0");
-		a = "9";
+		a = "-9";
 		b = 3;
 		test(a %= b, "0");
 		a = "10";
@@ -684,7 +690,6 @@ void RandomBigIntTest(unsigned long int testCount)
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	BigInt a, b;
 	unsigned long int m(0), n(0);
-	std::srand(time(NULL));
 	for (unsigned long int i(1); i <= testCount; i++)
 	{
 		cout << "\nTEST " << i << " =======================================\n";
@@ -841,7 +846,6 @@ void RandomBigIntDivisionTest(unsigned long int testCount)
 {
 	cout << "\n\n\tRANDOM DIVISION TEST\n\n";
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
-	std::srand(time(NULL));
 	
 	for (unsigned long int i(1); i <= testCount; i++)
 	{
@@ -865,8 +869,6 @@ void TestPrimeGenerator(unsigned long int testCount)
 	cout << "\n\n\tPRIME GENERATOR TEST\n\n";
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
-	//randomize the random number generator
-	std::srand(time(NULL));
 	for (unsigned long int i = 1; i <= testCount; i++)
 		cout 	<< i << ". " << PrimeGenerator::Generate(20, 3) 
 				<< endl << endl;
@@ -880,8 +882,6 @@ void TestKeyGeneration(unsigned long int testCount)
 	cout << "\n\n\tKEY GENERATION TEST\n\n";
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
-	//randomize the random number generator
-	std::srand(time(NULL));
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
 		cout 	<< i << ". " << endl; 

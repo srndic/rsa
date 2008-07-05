@@ -892,13 +892,16 @@ BigInt operator /(const BigInt &a, const BigInt &b)
 	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
 											b.digits, b.digitCount));
 	
-	//if leftNum == 0 or |leftNum| < |rightNum| 
+	//if a == 0 or |a| < |b| 
 	if (a.EqualsZero() || comparison == 2)
 		return BigIntZero;
 
-	//if leftNum == rightNum
+	//if a == b
 	if (comparison == 0)
-		return BigIntOne;
+		if (a.positive == b.positive)
+			return BigIntOne;
+		else 
+			return -BigIntOne;
 		
 	BigInt quotient, remainder;
 	BigInt::divide(a, b, quotient, remainder);
@@ -923,12 +926,12 @@ BigInt operator%(const BigInt &a, const BigInt &b)
 	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
 											b.digits, b.digitCount));
 	
-	//leftNum == rightNum 
+	//a == b 
 	if (comparison == 0)
 		return BigIntZero;
 
-	//if leftNum < rightNum
-	if (comparison == 2)
+	//if a < b
+	if (comparison == 2 && a.positive)
 		return a;
 		
 	BigInt quotient, remainder;

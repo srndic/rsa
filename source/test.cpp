@@ -168,8 +168,6 @@ void TestBigIntFunctions()
 	BigInt myNumberE1 = 384094351;
 	cout << "myNumberE1 = " << myNumberE1 << endl;
 	test(myNumberE1, 384094351);
-	//test unsigned long int constructor with negative input
-	//BigInt myNumberD = -3;	//throws "Error 04: Negative input integer.";
 	
 	//test copy constructor
 	BigInt myNumberF(myNumberA);
@@ -216,22 +214,22 @@ void TestBigIntFunctions()
 	test(myNumberA, 1);
 	
 	//test the EqualsZero member function
-	if (!myNumberA.EqualsZero())
-		cout << "myNumberA.EqualsZero() == false" << endl;
+	test(myNumberA.EqualsZero(), false);
 	myNumberA = BigIntZero;
-	if (myNumberA.EqualsZero())
-		cout << "myNumberA.EqualsZero() == true" << endl;
+	test(myNumberA.EqualsZero(), true);
 	myNumberA = "0";
-	if (myNumberA.EqualsZero())
-		cout << "myNumberA.EqualsZero() == true" << endl;
+	test(myNumberA.EqualsZero(), true);
 	myNumberA = BigIntOne - BigIntOne;
-	if (myNumberA.EqualsZero())
-		cout << "myNumberA.EqualsZero() == true" << endl;
+	test(myNumberA.EqualsZero(), true);
+	myNumberA = BigIntZero - BigIntOne;
+	test(myNumberA.EqualsZero(), false);
 	
 	//test the operator[]
 	myNumberA = "145";
 	if (myNumberA[0] == 1 && myNumberA[1] == 4 && myNumberA[2] == 5)
 		cout << "operator[] test passed" << endl;
+	else
+		pauseScreenOnError();
 //	if (myNumberA[4] == 0)
 //		cout << "operator[] test failed" << endl; //throws "Error 10: Index out of range.";
 
@@ -293,9 +291,9 @@ void TestBigIntOperators()
 
     cout << "\tOPERATORS <, <=, >, >=, ==\n\n";
     
-    BigInt t1(5), t2(3);
+    BigInt t1(3), t2(static_cast<unsigned long int>(0)), t3("-3");
     
-    for (; t1 > "0"; t1 = t1 - "1")
+    for (; t1 >= t3; t1 = t1 - BigIntOne)
     {
     	cout << t1 << " < " << t2 << " = " << (t1 < t2) << endl;
     	cout << t1 << " <= " << t2 << " = " << (t1 <= t2) << endl;
@@ -311,9 +309,9 @@ void TestBigIntOperators()
 
 	cout << "\tUNARY OPERATOR +\n\n";
 	{
-		BigInt num1 = 99, num2 = 1;
+		BigInt num1 = 99, num2 = "-1";
 		test(+num1, 99);
-		test(+num2, 1);
+		test(+num2, "-1");
 	}
 	
     cout << "\tBINARY OPERATOR +\n\n";
@@ -331,26 +329,53 @@ void TestBigIntOperators()
 		test(num3, num1 + num2);
 		num1 = "9834752937520397520395610694519";
 		cout << "num1 = " << num1 << endl;
-		test(num1, "9834752937520397520395610694519");
 		num2 = "56475638475928374692873450237450";
 		cout << "num2 = " << num2 << endl;
-		test(num2, "56475638475928374692873450237450");
 		num3 = num1 + num2;
 		cout << "num3 = num1 + num2\nnum3 = " << num3 << endl;
 		test(num3, "66310391413448772213269060931969");
 		cout << "num1 + num1 = " << (num1 + num1) << endl;
 		test(num1 + num1, "19669505875040795040791221389038");
+		
+		num1 = "-5"; num2 = "-3";
+		cout << "num1 = " << num1 << endl;
+		cout << "num2 = " << num2 << endl;
+		cout << "num1 + num2 = " << (num1 + num2) << endl;
+		test(num1 + num2, "-8");
+		cout << "num2 + num1 = " << (num2 + num1) << endl;
+		test(num2 + num1, "-8");
+		num2 = "3";
+		cout << "num1 = " << num1 << endl;
+		cout << "num2 = " << num2 << endl;
+		cout << "num1 + num2 = " << (num1 + num2) << endl;
+		test(num1 + num2, "-2");
+		cout << "num2 + num1 = " << (num2 + num1) << endl;
+		test(num2 + num1, "-2");
+		num1 = "5";
+		cout << "num1 = " << num1 << endl;
+		cout << "num2 = " << num2 << endl;
+		cout << "num1 + num2 = " << (num1 + num2) << endl;
+		test(num1 + num2, "8");
+		cout << "num2 + num1 = " << (num2 + num1) << endl;
+		test(num2 + num1, "8");
+		num2 = "-3";
+		cout << "num1 = " << num1 << endl;
+		cout << "num2 = " << num2 << endl;
+		cout << "num1 + num2 = " << (num1 + num2) << endl;
+		test(num1 + num2, "2");
+		cout << "num2 + num1 = " << (num2 + num1) << endl;
+		test(num2 + num1, "2");
+	}
+
+	cout << "\n\n\tBINARY OPERATOR -\n\n";
 	
-	    cout << "\n\n\tOPERATOR -\n\n";
+	{
 	    BigInt n1 = "1", n2 = "10";
-	    //test overloaded - operator with second operand bigger
-	    //cout << "n1 = " << n1 << "\nn2 = " << n2 << endl; //throws "Error 08: Invalid subtraction operands.";
-	    //cout << "n1 - n2 = " << (n1 - n2) << endl;
 	    //test overloaded - operator with equal operands
 	    n1 = "10";
 	    cout << "n1 = " << n1 << "\nn2 = " << n2 << endl;
 	    cout << "n1 - n2 = " << (n1 - n2) << endl;
-	    test(n1 - n2, (unsigned long int)0);
+	    test(n1 - n2, static_cast<unsigned long int>(0));
 	    //test overloaded - operator with first operand bigger
 	    n1 = "11";
 	    cout << "n1 = " << n1 << "\nn2 = " << n2 << endl;
@@ -389,79 +414,80 @@ void TestBigIntOperators()
 	    cout << "n1 = " << n1 << "\nn2 = " << n2 << endl;
 	    cout << "n1 - n2 = " << (n1 - n2) << endl;
 	    test(n1 - n2, "1");
-	}
-
-	{
-	    BigInt a = "1";
-	    BigInt b = "1";
-	
-	    cout << (a - b) << endl;
-	    test(a - b, (unsigned long int)0);
-	
-	    pauseScreen();
+	    
+	    n1 = "-5"; n2 = "-3";
+	    cout << "n1 = " << n1 << "\nn2 = " << n2 << endl;
+	    cout << "n1 - n2 = " << (n1 - n2) << endl;
+	    test(n1 - n2, "-2");
+	    cout << "n2 - n1 = " << (n2 - n1) << endl;
+	    test(n2 - n1, "2");
+	    n1 = "-5"; n2 = "3";
+	    cout << "n1 = " << n1 << "\nn2 = " << n2 << endl;
+	    cout << "n1 - n2 = " << (n1 - n2) << endl;
+	    test(n1 - n2, "-8");
+	    cout << "n2 - n1 = " << (n2 - n1) << endl;
+	    test(n2 - n1, "8");
+	    n1 = "5"; n2 = "3";
+	    cout << "n1 = " << n1 << "\nn2 = " << n2 << endl;
+	    cout << "n1 - n2 = " << (n1 - n2) << endl;
+	    test(n1 - n2, "2");
+	    cout << "n2 - n1 = " << (n2 - n1) << endl;
+	    test(n2 - n1, "-2");
+	    n1 = "5"; n2 = "-3";
+	    cout << "n1 = " << n1 << "\nn2 = " << n2 << endl;
+	    cout << "n1 - n2 = " << (n1 - n2) << endl;
+	    test(n1 - n2, "8");
+	    cout << "n2 - n1 = " << (n2 - n1) << endl;
+	    test(n2 - n1, "-8");
 	}
 
 	cout << "\n\n\tOPERATOR ++\n\n";
 
 	{
 		BigInt num;
-		
-		cout << "num = " << num << endl; 
-		cout << "++num = " << ++num << endl;
+		num++;
 		test(num, 1);
-		num = "0";
-		cout << "num++ = " << num++ << endl;
-		cout << "num = " << num << endl;
-		test(num, 1);
+		num = "-1";
+		test(++num, "0");
 	} 
 	
 	cout << "\n\n\tOPERATOR --\n\n";
 	
 	{
 		BigInt num(5);
-		
-		cout << "num = " << num << endl; 
-		cout << "--num = " << --num << endl;
+		num--;
 		test(num, 4);
-		num = "5";
-		cout << "num-- = " << num-- << endl;
-		cout << "num = " << num << endl;
-		test(num, 4);
+		num = "0";
+		test(--num, "-1");
 	}
 	
 	cout << "\n\n\tOPERATOR +=\n\n";
 	
 	{
-		//test overloaded += operator
-		pauseScreen();
-		
 		BigInt num1 = "9834752937520397520395610694519";
 		BigInt num2 = "56475638475928374692873450237450";
 		test((num1 += num2), "66310391413448772213269060931969");
 		num1 = "9834752937520397520395610694519";
 		test(num2 = (num1 += num1), "19669505875040795040791221389038");
+		num1 = "3"; num2 = "-5";
+		test((num1 += num2), "-2");
 	}
 	
 	cout << "\n\n\tOPERATOR -=\n\n";
 	
 	{
-		//test overloaded -= operator
-		pauseScreen();
-		
 		BigInt n1 = "66310391413448772213269060931969";
 	    BigInt n2 = "56475638475928374692873450237450";
 	    test((n1 -= n2), "9834752937520397520395610694519");
-	    n1 = "100";
-	    n2 = "99";
+	    n1 = "100"; n2 = "99";
 	    test(n2 = (n1 -= n2), "1");
+	    n1 = "-3"; n2 = "-4";
+	    test((n1 -= n2), "1");
 	}
 	
 	cout << "\n\n\tOPERATOR *\n\n";
 
 	{
-		//test overloaded * operator 
-		pauseScreen();
-		
 		BigInt a(10), b(20);
 		test(a * b, 200);
 		BigInt e(9900), f(9900);
@@ -477,19 +503,30 @@ void TestBigIntOperators()
 		test(a * b, "4444355556");
 		a = "0";
 		test(a * b, "0");
+		
+		a = "10"; b = "20";
+		test(a * b, "200");
+		test(b * a, "200");
+		a = "10"; b = "-20";
+		test(a * b, "-200");
+		test(b * a, "-200");
+		a = "-10"; b = "20";
+		test(a * b, "-200");
+		test(b * a, "-200");
+		a = "-10"; b = "-20";
+		test(a * b, "200");
+		test(b * a, "200");
 	}
 	
 	cout << "\n\n\tOPERATOR *=\n\n";
 
 	{
-		//test overloaded *= operator 
-		pauseScreen();
-		
 		BigInt a(10), b(20);
 		test(a *= b, 200);
-		BigInt e(9900), f(9900);
-		test(e *= f, 9900 * 9900);
+		BigInt e(9900), f("-9900");
+		test(e *= f, "-98010000");
 		e = 8448448;
+		f = -f;
 		test(e *= f, "83639635200");
 		a = "20";
 		b = "121645100408832000";
@@ -506,9 +543,6 @@ void TestBigIntOperators()
 	cout << "\n\n\tOPERATOR /\n\n";
 
 	{
-		//test overloaded / operator 
-		pauseScreen();
-		
 		BigInt a(10), b("0");
 //		test(a / b, "0");	//throws "Error 12: Attempt to divide by zero."
 		a = "0";
@@ -521,6 +555,15 @@ void TestBigIntOperators()
 		a = "9";
 		b = 3;
 		test(a / b, "3");
+		
+		a = "-10"; b = "-3";
+		test(a / b, 3);
+		b = "3";
+		test(a / b, "-3");
+		a = 10;
+		test(a / b, 3);
+		b = "-3";
+		test(a / b, "-3");
 	}
 	
 	cout << "\n\n\tOPERATOR /=\n\n";

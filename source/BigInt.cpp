@@ -105,12 +105,16 @@ int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,
 	    //compare the digits
 	    if (a[i] != b[i])
 		{
-		    if (a[i] < b[i])
-		    //a < b
-		        return 2;
-		    else if (a[i] > b[i])
-		    //a > b
-		        return 1;
+		    if (a[i] < b[i])	// |a| < |b|
+		    	if (aPositive)
+		    		return 2;	// a < b
+		    	else
+		    		return 1;	// a > b
+		    else 				// |a| > |b|
+		    	if (aPositive)	
+		    		return 1;	// a > b
+		    	else
+		    		return 2;	// a < b
 		}
 
 	//a == b
@@ -250,47 +254,50 @@ void BigInt::quickSub(	unsigned char *a, unsigned char *b,
 			*a = 9;
 }
 
-/* Divides two BigInt numbers. */
+/* Divides two BigInt numbers by the formula 
+ * dividend = divisor * quotient + remainder*/
 void BigInt::divide(const BigInt &dividend, const BigInt &divisor, 
 					BigInt &quotient, BigInt &remainder)
 {
-	BigInt Z1, R, X(dividend);
-	//make sure quotient and remainder are zero
-	//the lack of this check has introduced a bug in a prior version
-	quotient.digitCount = 1;
-	quotient.digits[0] = 0;
-	remainder.digitCount = 1;
-	remainder.digits[0] = 0;
+	BigInt Z1, R, X(dividend.Abs());
+	/* Make sure quotient and remainder are zero. 
+	 * The lack of this assignment introduces a bug if the actual parameters 
+	 * are not zero when calling this function. */
+	quotient = BigIntZero;
+	remainder = BigIntZero;
 	
-	while (X >= divisor)
+	// while |X| >= |divisor|
+	while (BigInt::compareNumbers(	X.digits, X.digitCount, 
+									divisor.digits, divisor.digitCount, 
+									true, true) != 2)	
 	{
-		unsigned long int O(X.Length() - divisor.Length());
-		if (O <= ULongMax.Length() - 2)
+		unsigned long int O(X.digitCount - divisor.digitCount);
+		if (O <= ULongMax.digitCount - 2)
 		{
 			unsigned long int i;
-			if (X.Length() > ULongMax.Length() - 1)
-				i = ULongMax.Length() - 1;
+			if (X.digitCount > ULongMax.digitCount - 1)
+				i = ULongMax.digitCount - 1;
 			else
-				i = X.Length();
+				i = X.digitCount;
 			unsigned long int j(i - O);
-			Z1 = 	toInt(X.digits + X.Length() - i, i) / 
-					toInt(divisor.digits + divisor.Length() - j, j);
+			Z1 = 	toInt(X.digits + X.digitCount - i, i) / 
+					toInt(divisor.digits + divisor.digitCount - j, j);
 		}
 		else
 		{
-			unsigned long int i(ULongMax.Length() - 1);
+			unsigned long int i(ULongMax.digitCount - 1);
 			unsigned long int j;
-			if (divisor.Length() > ULongMax.Length() - 2)
-				j = ULongMax.Length() - 2;
+			if (divisor.digitCount > ULongMax.digitCount - 2)
+				j = ULongMax.digitCount - 2;
 			else
-				j = divisor.Length();
-			Z1 = 	toInt(X.digits + X.Length() - i, i) / 
-					toInt(divisor.digits + divisor.Length() - j, j);
-			Z1.shiftLeft(O - Z1.Length());		
+				j = divisor.digitCount;
+			Z1 = 	toInt(X.digits + X.digitCount - i, i) / 
+					toInt(divisor.digits + divisor.digitCount - j, j);
+			Z1.shiftLeft(O - Z1.digitCount);		
 		}
 		
 		predictZ1:
-		R = Z1 * divisor;
+		R = (Z1 * divisor).Abs();
 	
 		if (X >= R)
 		{
@@ -299,7 +306,7 @@ void BigInt::divide(const BigInt &dividend, const BigInt &divisor,
 		}
 		else
 		{
-			if (Z1.Length() > 1)
+			if (Z1.digitCount > 1)
 				Z1.shiftRight(1);
 			else
 				--Z1;
@@ -466,11 +473,12 @@ BigInt::BigInt(const char * charNum) : digits(0)
 	if (! BigInt::allCharsAreDigits(charNum, digitCount))
 	    throw "Error 04: Input string contains characters other than digits.";
 		
-	//the input string was like "00...00\0"
+	//the input string was like ('+' or '-')"00...00\0"
 	if (charNum[0] == 0)
 	{
 		digitCount = 1;
 		charNum--;
+		positive = true;
 	}
 		
 	length = (int)(digitCount * factor + 1);

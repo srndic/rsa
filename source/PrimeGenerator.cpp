@@ -22,7 +22,7 @@
 #include <ctime>	//time()
 
 //A BigInt number with the value of RAND_MAX
-static const BigInt RandMax(RAND_MAX);
+static const BigInt RandMax(static_cast<unsigned long int>(RAND_MAX));
 //A BigInt number with the value of ULONG_MAX
 static const BigInt ULongMax(ULONG_MAX);
 
@@ -93,7 +93,7 @@ bool PrimeGenerator::isProbablePrime(	const BigInt &number,
 {
 	//first we need to calculate such a and b, that
 	//number - 1 = 2^a * b, a and b are integers, b is odd
-	BigInt numberMinusOne(number - 1);
+	BigInt numberMinusOne(number - BigIntOne);
 	unsigned long int a(0);
 	BigInt temp(numberMinusOne);
 	BigInt b, quotient;
@@ -164,8 +164,7 @@ BigInt PrimeGenerator::Generate(unsigned long int digitCount,
 	while (!isProbablePrime(primeCandidate, k))
 	{
 		//select the next odd number and try again
-		primeCandidate++;
-		primeCandidate++;
+		primeCandidate = primeCandidate + 2;
 		if (primeCandidate.digitCount != digitCount)
 		PrimeGenerator::makePrimeCandidate(primeCandidate, digitCount);
 	}

@@ -48,8 +48,8 @@ static const BigInt ULongMax(ULONG_MAX);
 static const BigInt SqrtULongMax
 				(static_cast<unsigned long int>(sqrt(ULONG_MAX)));
 
-//transforms the number from unsigned long int to unsigned char[]
-//and pads the result with zeroes
+/* Transforms the number from unsigned long int to unsigned char[]
+ * and pads the result with zeroes. Returns the number of digits. */
 unsigned long int BigInt::int2uchar(unsigned long int number, 
 									unsigned char *digits, 
 									unsigned long int padding = 0)
@@ -67,7 +67,7 @@ unsigned long int BigInt::int2uchar(unsigned long int number,
 	return i;
 }
 
-//converts ascii digits to equivalent unsigned char numbers
+/* Converts ASCII digits to equivalent unsigned char numeric values. */
 void BigInt::char2uchar(unsigned char *array, 
 						unsigned long int length)
 {
@@ -75,7 +75,7 @@ void BigInt::char2uchar(unsigned char *array,
 		array[i] -= '0';
 }
 
-//check if all ascii values are digits '0' to '9'
+/* Check if all ASCII values are digits '0' to '9'. */
 bool BigInt::allCharsAreDigits(	const char *array, 
 								unsigned long int length)
 {
@@ -117,8 +117,8 @@ int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,
 	return 0;
 }
 
-//multiplies two unsigned char []
-//we use the Divide and Conquer a.k.a. Karatsuba algorithm
+/* Multiplies two unsigned char[] using the Divide and Conquer 
+ * a.k.a. Karatsuba algorithm .*/
 void BigInt::karatsubaMultiply(	unsigned char *a, unsigned char *b,
 								unsigned long int n, unsigned char *buf1)
 {
@@ -180,7 +180,7 @@ void BigInt::karatsubaMultiply(	unsigned char *a, unsigned char *b,
 	}
 }
 
-//multiplies two unsigned char[] the long way
+/* Multiplies two unsigned char[] the long way. */
 void BigInt::longMultiply(	unsigned char *a, unsigned long int na,
 							unsigned char *b, unsigned long int nb,
 							unsigned char *result)
@@ -205,8 +205,8 @@ void BigInt::longMultiply(	unsigned char *a, unsigned long int na,
 	}
 }
 
-//simple addition, used by the multiply function
-//returns the remaining carry
+/* Simple addition, used by the multiply function.
+ * Returns the remaining carry. */
 unsigned char BigInt::quickAdd(	unsigned char *a, unsigned char *b, 
 								unsigned long int n)
 {
@@ -220,7 +220,7 @@ unsigned char BigInt::quickAdd(	unsigned char *a, unsigned char *b,
 	return carry;
 }
 
-//simple subtraction, used by the multiply function
+/* Simple subtraction, used by the multiply function. */
 void BigInt::quickSub(	unsigned char *a, unsigned char *b, 
 						unsigned char *end, unsigned long int n)
 {
@@ -250,7 +250,7 @@ void BigInt::quickSub(	unsigned char *a, unsigned char *b,
 			*a = 9;
 }
 
-//divides two BigInt numbers
+/* Divides two BigInt numbers. */
 void BigInt::divide(const BigInt &dividend, const BigInt &divisor, 
 					BigInt &quotient, BigInt &remainder)
 {
@@ -384,7 +384,7 @@ BigInt &BigInt::shiftLeft(unsigned long int n)
 BigInt &BigInt::shiftRight(unsigned long int n)
 {
 	if (n >= digitCount)
-		throw "Error 13: Overflow on shift right.";
+		throw "Error 00: Overflow on shift right.";
 	
 	std::copy_backward(	digits + n, digits + digitCount, 
 						digits + digitCount - n);
@@ -392,7 +392,7 @@ BigInt &BigInt::shiftRight(unsigned long int n)
 	return *this;
 }
 
-/*expands the digits to n places*/
+/* Expands the digits* to n. */
 void BigInt::expandTo(unsigned long int n)
 {
 	unsigned long int oldLength(length);
@@ -407,14 +407,13 @@ void BigInt::expandTo(unsigned long int n)
 		delete[] digits;
 		digits = oldDigits;
 		length = oldLength;
-		throw "Error 11: BigInt creation error (out of memory?).";
+		throw "Error 01: BigInt creation error (out of memory?).";
 	}
 
 	std::copy(oldDigits, oldDigits + digitCount, digits);
 	delete[] oldDigits;
 }
 
-/*Zero params constructor - creates a zero*/
 BigInt::BigInt() : digits(0), length(10), digitCount(1), positive(true)
 {
     try
@@ -424,20 +423,19 @@ BigInt::BigInt() : digits(0), length(10), digitCount(1), positive(true)
     catch (...)
     {
     	delete[] digits;
-        throw "Error 00: BigInt creation error (out of memory?).";
+        throw "Error 02: BigInt creation error (out of memory?).";
     }
 
     //initialize to 0
     digits[0] = 0;
 }
 
-/*const char * param constructor - converts a const char * into a BigInt*/
 BigInt::BigInt(const char * charNum) : digits(0)
 {
 	digitCount = strlen(charNum);
 
 	if (digitCount == 0)
-	    throw "Error 01: Input string empty.";
+	    throw "Error 03: Input string empty.";
 	else 
 	{
 		switch (charNum[0])
@@ -466,7 +464,7 @@ BigInt::BigInt(const char * charNum) : digits(0)
 
 	//check if the string contains only decimal digits
 	if (! BigInt::allCharsAreDigits(charNum, digitCount))
-	    throw "Error 02: Input string contains characters other than digits.";
+	    throw "Error 04: Input string contains characters other than digits.";
 		
 	//the input string was like "00...00\0"
 	if (charNum[0] == 0)
@@ -484,7 +482,7 @@ BigInt::BigInt(const char * charNum) : digits(0)
 	catch (...)
 	{
 		delete[] digits;
-		throw "Error 03: BigInt creation error (out of memory?).";
+		throw "Error 05: BigInt creation error (out of memory?).";
 	}
 
 	//copy the digits backwards to the new BigInt
@@ -493,24 +491,22 @@ BigInt::BigInt(const char * charNum) : digits(0)
 	BigInt::char2uchar(digits, digitCount);
 }
 
-/*long int param constructor - converts a long int into a BigInt*/
 BigInt::BigInt(unsigned long int intNum) : digits(0)
 {		
 	if (intNum < 0)
 	{
-	    positive = false;
-	    intNum = -intNum;
+		positive = false;
+		intNum = -intNum;
 	}
-    else
-    	positive = true;
-
+	else
+		positive = true;
+	
 	//we don't know how many digits there are in intNum since
 	//sizeof(long int) is platform dependent (2^128 ~ 39 digits), so we'll
 	//first save them in a temporary unsigned char[], and later copy them
 	unsigned char tempDigits[40] = {0};
 
 	digitCount = int2uchar(intNum, tempDigits);
-
 	length = (unsigned long int)(digitCount * factor + 1);
 
 	try
@@ -520,13 +516,12 @@ BigInt::BigInt(unsigned long int intNum) : digits(0)
 	catch (...)
 	{
 		delete [] digits;
-		throw "Error 05: BigInt creation error (out of memory?).";
+		throw "Error 06: BigInt creation error (out of memory?).";
 	}
 
 	std::copy(tempDigits, tempDigits + digitCount, digits);
 }
 
-/*copy constructor*/
 BigInt::BigInt(const BigInt &rightNumber) : length(rightNumber.length),
 digitCount(rightNumber.digitCount), positive(rightNumber.positive)
 {
@@ -540,13 +535,12 @@ digitCount(rightNumber.digitCount), positive(rightNumber.positive)
 	catch (...)
 	{
 		delete[] digits;
-		throw "Error 06: BigInt creation error (out of memory?).";
+		throw "Error 07: BigInt creation error (out of memory?).";
 	}
 
 	std::copy(rightNumber.digits, rightNumber.digits + digitCount, digits);
 }
 
-/*overloaded assignment operator*/
 BigInt &BigInt::operator =(const BigInt &rightNumber)
 {
 	//if the right-hand operand is longer than the left-hand one or
@@ -568,7 +562,7 @@ BigInt &BigInt::operator =(const BigInt &rightNumber)
 			delete[] digits;
 			//restore the digits
 			digits = tempDigits;
-			throw "Error 07: BigInt assignment error (out of memory?).";
+			throw "Error 08: BigInt assignment error (out of memory?).";
 		}
 		//it turns out we don't need this any more
 		delete[] tempDigits;
@@ -584,7 +578,6 @@ BigInt &BigInt::operator =(const BigInt &rightNumber)
 	return *this;
 }
 
-/*overloaded left shift operator used for console output*/
 std::ostream &operator <<(std::ostream &cout, const BigInt &number)
 {
 	if (!number.positive)
@@ -595,7 +588,6 @@ std::ostream &operator <<(std::ostream &cout, const BigInt &number)
 	return cout;
 }
 
-/*overloaded < operator*/
 bool operator <(const BigInt &a, const BigInt &b)
 {
 	if (BigInt::compareNumbers(	a.digits, a.digitCount,
@@ -605,7 +597,6 @@ bool operator <(const BigInt &a, const BigInt &b)
 	return false;
 }
 
-/*overloaded <= operator*/
 bool operator <=(const BigInt &a, const BigInt &b)
 {
 	if (BigInt::compareNumbers(	a.digits, a.digitCount,
@@ -615,7 +606,6 @@ bool operator <=(const BigInt &a, const BigInt &b)
 	return true;
 }
 
-/*overloaded > operator*/
 bool operator >(const BigInt &a, const BigInt &b)
 {
 	if (BigInt::compareNumbers(	a.digits, a.digitCount,
@@ -625,7 +615,6 @@ bool operator >(const BigInt &a, const BigInt &b)
 	return false;
 }
 
-/*overloaded >= operator*/
 bool operator >=(const BigInt &a, const BigInt &b)
 {
 	if (BigInt::compareNumbers(	a.digits, a.digitCount,
@@ -635,7 +624,6 @@ bool operator >=(const BigInt &a, const BigInt &b)
 	return true;
 }
 
-/*overloaded == operator*/
 bool operator ==(const BigInt &a, const BigInt &b)
 {
 	if (BigInt::compareNumbers(	a.digits, a.digitCount,
@@ -645,7 +633,6 @@ bool operator ==(const BigInt &a, const BigInt &b)
 	return true;
 }
 
-/*overloaded != operator*/
 bool operator !=(const BigInt &a, const BigInt &b)
 {
 	if (BigInt::compareNumbers(	a.digits, a.digitCount,
@@ -655,7 +642,6 @@ bool operator !=(const BigInt &a, const BigInt &b)
 	return false;
 }
 
-/*overloaded addition operator*/
 BigInt operator +(const BigInt &a, const BigInt &b)
 {
 	if (a.positive && !b.positive)
@@ -690,7 +676,7 @@ BigInt operator +(const BigInt &a, const BigInt &b)
 	return sum;
 }
 
-/*overloaded ++ operator, prefix version*/							
+/*overloaded ++ operator, prefix version*/
 BigInt &BigInt::operator++()
 {
 	return *this += BigIntOne;
@@ -704,7 +690,6 @@ BigInt BigInt::operator++(int)
 	return temp;
 }
 
-/*overloaded += operator*/
 BigInt &BigInt::operator+=(const BigInt &number)
 {
 	*this = *this + number;
@@ -718,7 +703,6 @@ BigInt BigInt::operator-() const
 	return temp;
 }
 
-/*overloaded subtraction operator*/
 BigInt operator-(const BigInt &a, const BigInt &b)
 {
 	if (!a.positive && b.positive)
@@ -801,14 +785,14 @@ BigInt operator-(const BigInt &a, const BigInt &b)
     return result;
 }
 
-/*overloaded -- operator, prefix version*/							
+/*overloaded -- operator, prefix version*/
 BigInt &BigInt::operator--()
 {
 	*this = *this - BigIntOne;
 	return *this;
 }
 
-/*overloaded -- operator, postfix version*/							
+/*overloaded -- operator, postfix version*/
 BigInt BigInt::operator--(int)
 {
 	BigInt temp(*this);
@@ -816,14 +800,12 @@ BigInt BigInt::operator--(int)
 	return temp;
 }
 
-/*overloaded -= operator*/
 BigInt &BigInt::operator-=(const BigInt &number)
 {
 	*this = *this - number;
 	return *this;	
 }
 
-/*overloaded multiplication operator*/
 BigInt operator*(const BigInt &a, const BigInt &b)
 {
 	if (a.EqualsZero() || b.EqualsZero())
@@ -885,19 +867,18 @@ BigInt operator*(const BigInt &a, const BigInt &b)
 	return bigIntResult;
 }
 
-/*overloaded *= operator*/
 BigInt &BigInt::operator*=(const BigInt &number)
 {
 	*this = *this * number;
 	return *this;
 }
 
-/* overloaded division operator
- * works according to the formula leftNum == Z * rightNum + L*/
+/* Overloaded division operator. 
+ * Works according to the formula leftNum == Z * rightNum + L*/
 BigInt operator /(const BigInt &a, const BigInt &b)
 {
 	if (b.EqualsZero())
-		throw "Error 12: Attempt to divide by zero.";
+		throw "Error 10: Attempt to divide by zero.";
 		
 	//we don't want to call this function twice
 	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
@@ -919,18 +900,16 @@ BigInt operator /(const BigInt &a, const BigInt &b)
 	return quotient;
 }
 
-/*overloaded /= operator*/
 BigInt &BigInt::operator /=(const BigInt &number)
 {
 	*this = *this / number;
 	return *this;
 }
 
-/*overloaded remainder operator*/
 BigInt operator%(const BigInt &a, const BigInt &b)
 {
 	if (b.EqualsZero())
-		throw "Error 14: Attempt to divide by zero.";
+		throw "Error 11: Attempt to divide by zero.";
 		
 	//we don't want to call this function twice
 	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
@@ -949,15 +928,14 @@ BigInt operator%(const BigInt &a, const BigInt &b)
 	return remainder;
 }
 							
-/*overloaded %= operator*/
 BigInt &BigInt::operator%=(const BigInt &number)
 {
 	*this = *this % number;
 	return *this;
 }
 
-/* returns *this to the power of n 
- * using the fast Square and Multiply algorithm*/
+/* Returns *this to the power of n 
+ * using the fast Square and Multiply algorithm. */
 BigInt BigInt::GetPower(unsigned long int n) const
 {
 	BigInt result(BigIntOne);
@@ -981,18 +959,22 @@ BigInt BigInt::GetPower(unsigned long int n) const
 	return result;
 }
 
-/* *this = *this to the power of n*/
+/* *this = *this to the power of n. */
 void BigInt::SetPower(unsigned long int n)
 {
 	*this = (*this).GetPower(n);
 }
 
-/* returns *this to the power of n 
- * using the fast Square and Multiply algorithm*/
+/* Returns *this to the power of n 
+ * using the fast Square and Multiply algorithm. */
 BigInt BigInt::GetPower(BigInt n) const
 {
+	if (!n.positive)
+		throw "Error 12: Negative exponents not supported!";
+	
 	BigInt result(BigIntOne);
 	BigInt base(*this);
+	BigInt bigIntTwo(BigIntOne + BigIntOne);
 	
 	while (!n.EqualsZero())
 	{
@@ -1002,7 +984,7 @@ BigInt BigInt::GetPower(BigInt n) const
 			result = result * base;
 			n--;
 		}
-		n = n / 2;
+		n = n / bigIntTwo;
 		base = base * base;
 	}
 	
@@ -1012,13 +994,13 @@ BigInt BigInt::GetPower(BigInt n) const
 	return result;
 }
 
-/* *this = *this to the power of n*/
+/* *this = *this to the power of n. */
 void BigInt::SetPower(BigInt n)
 {
 	*this = (*this).GetPower(n);
 }
 
-/* returns (*this to the power of b) mod n */
+/* Returns (*this to the power of b) mod n. */
 BigInt BigInt::GetPowerMod(const BigInt &b, const BigInt &n) const
 {
 	BigInt a(*this);
@@ -1026,7 +1008,7 @@ BigInt BigInt::GetPowerMod(const BigInt &b, const BigInt &n) const
 	return a;
 }
 
-/* *this = (*this to the power of b) mod n */
+/* *this = (*this to the power of b) mod n. */
 void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
 {
 	//we will need this value later, since *this is going to change
@@ -1036,7 +1018,7 @@ void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
 	const BigInt two(BigIntOne + BigIntOne);
 	
 	//first we will find the binary representation of b
-	std::vector<bool> bits(100);
+	std::vector<bool> bits;
 	while (!bCopy.EqualsZero())
 	{
 		BigInt::divide(bCopy, two, q, r);
@@ -1057,16 +1039,16 @@ void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
 	}
 }
 
-/*overloaded [] operator, returns the nth digit*/
+/* Returns the nth digit. */
 unsigned char BigInt::operator [](unsigned long int n) const
 {
 	if (n >= digitCount)
-		throw "Error 10: Index out of range.";
+		throw "Error 13: Index out of range.";
 		
 	return digits[digitCount - n - 1];
 }
 
-/*returns the value of BigInt as string*/
+/* Returns the value of BigInt as std::string. */
 std::string BigInt::ToString(bool forceSign) const
 {
 	std::string bigIntStr(digits, digits + digitCount);

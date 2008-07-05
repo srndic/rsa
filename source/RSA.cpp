@@ -91,7 +91,7 @@ KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount,
 	BigInt n(p * q);
 	
 	//calculate the totient phi
-	BigInt phi((p - 1) * (q - 1));
+	BigInt phi((p - BigIntOne) * (q - BigIntOne));
 	
 	//we don't want the keys to be less than 20 bits long
 	if (phi < "1048576")

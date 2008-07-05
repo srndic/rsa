@@ -143,6 +143,7 @@ void TestBigIntFunctions()
     BigInt myNumberA;
     cout << "myNumberA = " << myNumberA << endl;
     test(myNumberA, "0");
+    
     //test const char* constructor
     BigInt myNumberB = "00000290823984273072361";
 	cout << "myNumberB = " << myNumberB << endl;
@@ -150,36 +151,45 @@ void TestBigIntFunctions()
 	BigInt myNumberB1 = "290823984273072361257203975203975203952093520984121286128681286186200880243234234234162356876909986221564574980882162898021200892208721076218021087612698981290809216790921";
 	cout << "myNumberB1 = " << myNumberB1 << endl;
 	test(myNumberB1, "290823984273072361257203975203975203952093520984121286128681286186200880243234234234162356876909986221564574980882162898021200892208721076218021087612698981290809216790921");
+	myNumberB1 = "-000005";
+	test(myNumberB1, "-5");
 	//test const char* constructor with invalid characters
 	//BigInt myNumberC = "2308238902230823a"; throws "Error 02: Input string contains characters other than digits.";
 	//test const char* constructor with an empty string
 	//BigInt myNumberC = "";	//throws "Error 01: Input string empty.";
-	//test long int constructor with negative input
-	//BigInt myNumberD = -3;	//throws "Error 04: Negative input integer.";
-	//test long int constructor
+	
+	//test unsigned long int constructor
 	BigInt myNumberE = 8840;
 	cout << "myNumberE = " << myNumberE << endl;
 	test(myNumberE, 8840);
-	//test long int constructor
 	BigInt myNumberZ = (unsigned long int) 0;
 	cout << "myNumberZ = " << myNumberZ << endl;
 	test(myNumberZ, (unsigned long int) 0);
-	//test long int constructor
 	BigInt myNumberE1 = 384094351;
 	cout << "myNumberE1 = " << myNumberE1 << endl;
 	test(myNumberE1, 384094351);
+	//test unsigned long int constructor with negative input
+	//BigInt myNumberD = -3;	//throws "Error 04: Negative input integer.";
+	
 	//test copy constructor
 	BigInt myNumberF(myNumberA);
 	cout << "myNumberF = " << myNumberF << endl;
 	test(myNumberF, myNumberA);
-	//test copy constructor
 	BigInt myNumberG(myNumberB1);
 	cout << "myNumberG = " << myNumberG << endl;
 	test(myNumberG, myNumberB1);
+	BigInt myNumberG1(myNumberB1);
+	cout << "myNumberG1 = " << myNumberG1 << endl;
+	test(myNumberG1, myNumberB1);
+	
 	//test overloaded assignment operator with right number bigger
 	myNumberA = myNumberB;
 	cout << "myNumberA = " << myNumberA << endl;
 	test(myNumberA, myNumberB);
+	//test overloaded assignment operator with right number negative
+	myNumberA = myNumberB1;
+	cout << "myNumberA = " << myNumberA << endl;
+	test(myNumberA, myNumberB1);
 	//test overloaded assignment operator with right number smaller
 	myNumberA = myNumberE;
 	cout << "myNumberA = " << myNumberA << endl;
@@ -204,9 +214,10 @@ void TestBigIntFunctions()
 	myNumberA = "1";
 	cout << "myNumberA = " << myNumberA << endl;
 	test(myNumberA, 1);
+	
+	//test the EqualsZero member function
 	if (!myNumberA.EqualsZero())
 		cout << "myNumberA.EqualsZero() == false" << endl;
-	//test the EqualsZero member function
 	myNumberA = BigIntZero;
 	if (myNumberA.EqualsZero())
 		cout << "myNumberA.EqualsZero() == true" << endl;
@@ -216,6 +227,7 @@ void TestBigIntFunctions()
 	myNumberA = BigIntOne - BigIntOne;
 	if (myNumberA.EqualsZero())
 		cout << "myNumberA.EqualsZero() == true" << endl;
+	
 	//test the operator[]
 	myNumberA = "145";
 	if (myNumberA[0] == 1 && myNumberA[1] == 4 && myNumberA[2] == 5)
@@ -223,34 +235,10 @@ void TestBigIntFunctions()
 //	if (myNumberA[4] == 0)
 //		cout << "operator[] test failed" << endl; //throws "Error 10: Index out of range.";
 
+	//test GetPower(int), SetPower(int), GetPower(BigInt), SetPower(BigInt)
 	BigInt a(2), b(3);
-	test(a * b, 6);
-	a = 10000, b = 10000;
-	test(a * b, "100000000");
-	a = 100000;
-	cout << a * b;
-	test(a * b, "1000000000");
-	a = 1000000;
-	cout << a * b;
-	test(a * b, "10000000000");
-//	a = 2;
-//	cout << a.GetPower(10);
-//	test(a.GetPower(10), 1024);
-	a = 65536; b = 32768;
-	cout << b * a << endl;
-	test(a * b, "2147483648");
-	a = "111111111111"; b = "111111111111";
-	cout << a * b << endl;
-	test(a * b, "12345679012320987654321");
-	a = 65536; b = 65536;
-	cout << a * b << endl;
-	test(a * b, "4294967296");
-	a = "67296"; b = "83648";
-	cout << a * b;
-	test(a * b, "5629175808");
-	a = "4294967296"; b = "2147483648";
-	cout << a * b;
-	test(a * b, "9223372036854775808");
+	cout << a.GetPower(10);
+	test(a.GetPower(10), 1024);
 	a = 2;
 	cout << a.GetPower(63) << endl;
 	test(a.GetPower(63), "9223372036854775808");
@@ -258,14 +246,42 @@ void TestBigIntFunctions()
 	test(a.GetPower(71), "2361183241434822606848");
 	test(a.GetPower(0), "1");
 	a = "10";
-	cout << (a.GetPower(6)) << endl;
-	test(a.GetPower(6), "1000000");
-	cout << (a.GetPower(200)) << endl;
-	test(a.GetPower(200), "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+	a.SetPower(6);
+	cout << a << endl;
+	test(a, "1000000");
+	a = 10;
+	cout << (a.GetPower("200")) << endl;
+	test(a.GetPower("200"), "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+	a.SetPower(b);
+	cout << a << endl;
+	test(a, "1000");
+	
+	//test SetPowerMod(), GetPowerMod()
+	a = 3;
+	b = 3;
+	cout << a.GetPowerMod(b, 5) << endl;
+	test(a.GetPowerMod(b, 5), 2);
+	a.SetPowerMod(b, 5);
+	cout << a << endl;
+	test(a, 2);
+	
+	//test ToString()
 	a = "10000000000";
 	cout << a.ToString() << endl;
+	cout << a.ToString(true) << endl;
+	a = -a;
+	cout << a.ToString() << endl;
+	
+	//test Length()
 	cout << a.Length() << endl;
-	test(a.Length(), 11); 
+	test(a.Length(), 11);
+	
+	//test Abs()
+	a = "10";
+	cout << "a.Abs() = " << a.Abs() << endl;
+	test(a.Abs(), a);
+	cout << "(-a).Abs() = " << (-a).Abs() << endl;
+	test((-a).Abs(), a);
 }
 
 void TestBigIntOperators()

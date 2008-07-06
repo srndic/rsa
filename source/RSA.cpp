@@ -12,10 +12,9 @@
  * ****************************************************************************
  */
 
-#include <cstdlib>	//srand()
-#include <ctime>	//time()
 #include "RSA.h"
-#include "KeyPair.h"
+#include "Key.h"	//Key
+#include "KeyPair.h"	//KeyPair
 #include "PrimeGenerator.h"	//Generate()
 
 /* Returns the greatest common divisor of the two arguments 
@@ -105,7 +104,7 @@ KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount,
 	//make sure the requirements are met
 	while (RSA::GCD(phi, e) != BigIntOne || e < "65537")
 	{
-		PrimeGenerator::makeRandom(e, 5);
+		PrimeGenerator::MakeRandom(e, 5);
 	}
 	
 	//now we have enough information to create the public key

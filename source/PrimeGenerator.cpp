@@ -18,8 +18,6 @@
  */
 
 #include "PrimeGenerator.h"
-#include <cstdlib>	//rand(), srand()
-#include <ctime>	//time()
 
 //A BigInt number with the value of RAND_MAX
 static const BigInt RandMax(static_cast<unsigned long int>(RAND_MAX));
@@ -28,7 +26,7 @@ static const BigInt ULongMax(ULONG_MAX);
 
 /* Generates a random number with digitCount digits.
  * Returns it by reference in the "number" parameter. */
-void PrimeGenerator::makeRandom(BigInt &number, unsigned long int digitCount)
+void PrimeGenerator::MakeRandom(BigInt &number, unsigned long int digitCount)
 {
 	//make sure there is enough space
 	if (number.length < digitCount + RandMax.digitCount + 10)
@@ -53,6 +51,9 @@ void PrimeGenerator::makeRandom(BigInt &number, unsigned long int digitCount)
 
 	//adjust the digitCount property of a to the required number of digits
 	number.digitCount = digitCount;
+	//make sure the leading digit is not zero
+	if (number.digits[number.digitCount - 1] == 0)
+		number.digits[number.digitCount - 1] = (std::rand() % 9) + 1;
 }
 
 /* Generates a random "number" such as 1 <= "number" < "top".
@@ -61,13 +62,10 @@ void PrimeGenerator::makeRandom(BigInt &number, const BigInt &top)
 {
 	//randomly select the number of digits for the random number
 	unsigned long int newDigitCount = (rand() % top.digitCount) + 1;
-	makeRandom(number, newDigitCount);
+	MakeRandom(number, newDigitCount);
 	//make sure the number is < top and not zero
 	while (number >= top || number.EqualsZero())
-		makeRandom(number, newDigitCount);
-	//make sure the leading digit is not zero
-	while (number.digits[number.digitCount - 1] == 0)
-		number.digitCount--;
+		MakeRandom(number, newDigitCount);
 }
 
 /* Creates an odd BigInt with the specified number of digits. 
@@ -75,13 +73,13 @@ void PrimeGenerator::makeRandom(BigInt &number, const BigInt &top)
 void PrimeGenerator::makePrimeCandidate(BigInt &number,
 										unsigned long int digitCount)
 {
-	PrimeGenerator::makeRandom(number, digitCount);
+	PrimeGenerator::MakeRandom(number, digitCount);
 	//make the number odd
 	if (!(number.digits[0] & 1))
 		number.digits[0]++;
 	//make sure the leading digit is not a zero
-	while (number.digits[number.digitCount - 1] == 0)
-		number.digits[number.digitCount - 1] = std::rand() % 10;
+	if (number.digits[number.digitCount - 1] == 0)
+		number.digits[number.digitCount - 1] = (std::rand() % 9) + 1;
 }
 
 /* Tests the primality of the given _odd_ number using the 
@@ -113,13 +111,11 @@ bool PrimeGenerator::isProbablePrime(	const BigInt &number,
 	//that "number" is prime is at least 1 - 4^(-k)
 	for (unsigned long int i = 0; i < k; i++)
 	{
-		//reuse temp to generate a random number, 1 <= temp <= number - 1
 		PrimeGenerator::makeRandom(temp, number);
-
+		
 		if (isWitness(temp, number, b, a, numberMinusOne))
 			return false; //definitely a composite number
 	}
-
 	return true; //a probable prime
 }
 

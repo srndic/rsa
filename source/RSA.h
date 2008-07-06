@@ -29,6 +29,7 @@
 
 #include <string>
 #include "KeyPair.h"
+#include "Key.h"
 #include "BigInt.h"
 
 class RSA

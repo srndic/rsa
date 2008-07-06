@@ -1,3 +1,17 @@
+/* ****************************************************************************
+ * 
+ * 				KeyPair.h
+ * 
+ * Author: Nedim Srndic
+ * Release date: 17th of June 2008
+ * 
+ * A class representing a public/private RSA key-pair. 
+ * 
+ * A key-pair consists of a public key and a matching private key. 
+ * 
+ * ****************************************************************************
+ */
+
 #ifndef KEYPAIR_H_
 #define KEYPAIR_H_
 

@@ -10,8 +10,6 @@
  * A public or private RSA key consists of a modulus and an exponent. In this 
  * implementation an object of type BigInt is used to store those values. 
  * 
- * Once set, the keys can only be modified by the friend class RSA. 
- * 
  * ****************************************************************************
  */
 
@@ -19,7 +17,6 @@
 #define KEY_H_
 
 #include "BigInt.h"
-#include "RSA.h"
 
 class Key
 {

@@ -836,14 +836,14 @@ BigInt operator*(const BigInt &a, const BigInt &b)
 		throw "Error 09: Not enough memory?";
 	}
 	
-	unsigned char *b(buffer + n), *c(b + n);
+	unsigned char *bb(buffer + n), *bc(bb + n);
 	
 	std::copy(a.digits, a.digits + a.digitCount, buffer);
 	std::fill(buffer + a.digitCount, buffer + n, 0);	
-	std::copy(b.digits, b.digits + b.digitCount, b);
-	std::fill(b + b.digitCount, b + n, 0);
+	std::copy(b.digits, b.digits + b.digitCount, bb);
+	std::fill(bb + b.digitCount, bb + n, 0);
 	
-	BigInt::karatsubaMultiply(buffer, b, n, c);
+	BigInt::karatsubaMultiply(buffer, bb, n, bc);
 	
 	n <<= 1;
 #else  
@@ -854,14 +854,14 @@ BigInt operator*(const BigInt &a, const BigInt &b)
 	BigInt::longMultiply(	a.digits, a.digitCount, 
 							b.digits, b.digitCount, buffer);
 							
-	unsigned char *c(buffer);
+	unsigned char *bc(buffer);
 #endif /*KARATSUBA*/
 	
 	BigInt bigIntResult;	//we assume it's a positive number
 	if (a.positive != b.positive)
 		bigIntResult.positive = false;
 	bigIntResult.expandTo(n + 10);
-	std::copy(c, c + n, bigIntResult.digits);
+	std::copy(bc, bc + n, bigIntResult.digits);
 	for (unsigned long int i = n - 1; i > 0; i--)
 	{
 		if (bigIntResult.digits[i])

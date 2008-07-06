@@ -8,18 +8,18 @@
  * A collection of test code, used to test the functionality of other classes. 
  * 
  * TODO: test SqrtULongMax.GetPower(2)
- * TODO: test SetPower()
- * TODO: test operators on negative numbers
  * 
  * ****************************************************************************
  */
 
 #include "test.h"
-#include "BigInt.h"
-#include "PrimeGenerator.h"
-#include <iostream>
-#include <ctime>
-#include <climits>
+#include "BigInt.h"	//BigInt
+#include "PrimeGenerator.h"	//Generate()
+#include "Key.h"	//Key
+#include "KeyPair.h"	//KeyPair
+#include "RSA.h"	//GenerateKeyPair()
+#include <iostream>	//cout, cin
+#include <ctime>	//clock...
 #include <cstdlib>
 
 using std::cout;
@@ -126,7 +126,7 @@ void factorialTimeTest(unsigned long int n, const char *factorialOfN)
 	std::clock_t startTime(std::clock()), finishTime;
 	BigInt a(factorial(n));
 	finishTime = std::clock();
-	double time((double(finishTime)-double(startTime))/CLOCKS_PER_SEC);
+	double time((double(finishTime) - double(startTime)) / CLOCKS_PER_SEC);
 	cout << "factorial(" << n << ") = " << a << endl 
 		<< "Time: " << time << "s" << endl;
 	test(a, factorialOfN);
@@ -870,7 +870,7 @@ void TestPrimeGenerator(unsigned long int testCount)
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
 	for (unsigned long int i = 1; i <= testCount; i++)
-		cout 	<< i << ". " << PrimeGenerator::Generate(20, 3) 
+		cout 	<< i << ". " << PrimeGenerator::Generate(10, 3) 
 				<< endl << endl;
 	
 	cout << "\nPrime generator test finished!" << endl;
@@ -884,7 +884,7 @@ void TestKeyGeneration(unsigned long int testCount)
 	
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
-		cout 	<< i << ". " << endl; 
+		cout << i << ". " << endl;
 		KeyPair newKeyPair(RSA::GenerateKeyPair(10));
 		cout << "Private Key" << endl;
 		cout << "\tModulus: \t" 

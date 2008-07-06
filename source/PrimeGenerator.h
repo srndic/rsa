@@ -6,8 +6,6 @@
  * Author: Nedim Srndic
  * Release date: 14th of March 2008
  * 
- * TODO: write comments
- * 
  * ****************************************************************************
  */
 
@@ -15,17 +13,10 @@
 #define PRIMEGENERATOR_H_
 
 #include "BigInt.h"
-#include "RSA.h"
 
 class PrimeGenerator
 {
 	private:
-		//for optimization purposes
-		friend class RSA;
-		/* Generates a random number with digitCount digits.
-		 * Returns it by reference in the "number" parameter. */
-		static void makeRandom(	BigInt &number, 
-								unsigned long int digitCount);
 		/* Generates a random "number" such as 1 <= "number" < "top".
 		 * Returns it by reference in the "number" parameter. */
 		static void makeRandom(	BigInt &number, 
@@ -49,6 +40,10 @@ class PrimeGenerator
 								unsigned long int squareCount, 
 								const BigInt &numberMinusOne);
 	public:
+		/* Generates a random number with digitCount digits.
+		 * Returns it by reference in the "number" parameter. */
+		static void MakeRandom(	BigInt &number, 
+								unsigned long int digitCount);
 		/* Returns a probable prime number "digitCount" digits long, 
 		 * with a probability of at least 1 - 4^(-k) that it is prime. */
 		static BigInt Generate(	unsigned long int digitCount, 

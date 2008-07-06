@@ -7,10 +7,6 @@
  * 
  * Header file containing declarations of test functions.  
  * 
- * 	TODO: 	add tests for the PrimeGenerator class
- * 	TODO:	add tests for the RSA class
- * 	TODO:	add tests for the Key class
- * 
  * ****************************************************************************
  */
  

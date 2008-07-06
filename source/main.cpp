@@ -6,19 +6,16 @@
  * Author: Nedim Srndic
  * Release date: 14th of March 2008
  * 
- * TODO: add code to demonstrate basic functionality 
- * of RSA. 
+ * TODO: add code to demonstrate basic functionality of RSA. 
  * 
  * ****************************************************************************
  */
 
-#include <cstdlib>
-#include <iostream>
-#include <ctime>
-#include "RSA.h"
-#include "BigInt.h"
-#include "PrimeGenerator.h"
-#include "test.h"
+#include <cstdlib>	//srand()
+#include <iostream>	//cout
+#include <ctime>	//time()
+#include "BigInt.h"	//BigInt
+#include "test.h"	//testing functions
 
 using std::cout;
 using std::endl;
@@ -41,9 +38,9 @@ int main(int argc, char *argv[])
 		/*				RANDOM DIVISION TEST GENERATOR			*/
 		RandomBigIntDivisionTest(10);
 		/*				PRIME GENERATOR TEST					*/
-		TestPrimeGenerator(2);
+		TestPrimeGenerator(5);
 		/*				KEY GENERATOR TEST						*/
-		TestKeyGeneration(2);
+		TestKeyGeneration(20);
 
 		BigInt fact(BigIntOne);
 		for (BigInt i(BigIntOne); i <= "1000"; i++)

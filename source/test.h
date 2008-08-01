@@ -29,5 +29,9 @@ void RandomBigIntDivisionTest(unsigned long int testCount);
 void TestPrimeGenerator(unsigned long int testCount);
 /*				KEY GENERATOR TEST						*/
 void TestKeyGeneration(unsigned long int testCount);
+/*				ENCRYPTION/DECRYPTION TEST				*/
+void TestEncryptionDecryption(unsigned long int testCount);
+/*				FILE ENCRYPTION/DECRYPTION TEST			*/
+void TestFileEncryptionDecryption(unsigned long int testCount);
 
 #endif /*TEST_H_*/

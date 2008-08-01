@@ -5,9 +5,9 @@
  * Author: Nedim Srndic
  * Release date: 14th of March 2008
  * 
- * A collection of test code, used to test the functionality of other classes. 
+ * A collection of test code, used to test the functionality of other classes.
  * 
- * TODO: test SqrtULongMax.GetPower(2)
+ * TODO: test IsOdd(), IsPositive() 
  * 
  * ****************************************************************************
  */
@@ -21,6 +21,7 @@
 #include <iostream>	//cout, cin
 #include <ctime>	//clock...
 #include <cstdlib>
+#include <string>	//BigInt::operator std::string() const
 
 using std::cout;
 using std::endl;
@@ -55,19 +56,19 @@ void testVerbose(const BigInt &a, const BigInt &b)
 		cout << "\t\tTEST OK!" << endl;
 }
 
-void testVerbose(unsigned long int a, unsigned long int b)
-{
-	cout << " = " << a;
-	if (a != b)
-	{
-	cout << ", NOT " << b << "\t\tTEST FAIL!" << endl;
-		pauseScreenOnError();
-	}
-	else
-		cout << "\t\tTEST OK!" << endl;
-}
-
-void testVerbose(bool a, bool b)
+//void testVerbose(unsigned long int a, unsigned long int b)
+//{
+//	cout << " = " << a;
+//	if (a != b)
+//	{
+//	cout << ", NOT " << b << "\t\tTEST FAIL!" << endl;
+//		pauseScreenOnError();
+//	}
+//	else
+//		cout << "\t\tTEST OK!" << endl;
+//}
+template <typename T>
+void testVerbose(T a, T b)
 {
 	cout << " = " << a;
 	if (a != b)
@@ -90,18 +91,8 @@ void test(const BigInt &a, const BigInt &b)
 		cout << "\t\tTEST OK!" << endl;
 }
 
-void test(unsigned long int a, unsigned long int b)
-{
-	if (a != b)
-	{
-		cout << "\t\tTEST FAIL!" << endl;
-		pauseScreenOnError();
-	}
-	else
-		cout << "\t\tTEST OK!" << endl;
-}
-
-void test(bool a, bool b)
+template <typename T>
+void test(T a, T b)
 {
 	if (a != b)
 	{
@@ -169,6 +160,17 @@ void TestBigIntFunctions()
 	cout << "myNumberE1 = " << myNumberE1 << endl;
 	test(myNumberE1, 384094351);
 	
+	//test std::string constructor 
+	std::string strNum("123456");
+	BigInt newBI(strNum);
+	test(newBI, "123456");
+	//test std::string constructor with invalid characters
+//	strNum = "23082334378652458902230823a";
+	BigInt newBI2(strNum); //throws "Error 02: Input string contains characters other than digits.";
+	//test const char* constructor with an empty string
+	strNum.clear();
+//	BigInt newBI3(strNum);	//throws "Error 01: Input string empty.";
+	
 	//test copy constructor
 	BigInt myNumberF(myNumberA);
 	cout << "myNumberF = " << myNumberF << endl;
@@ -179,6 +181,10 @@ void TestBigIntFunctions()
 	BigInt myNumberG1(myNumberB1);
 	cout << "myNumberG1 = " << myNumberG1 << endl;
 	test(myNumberG1, myNumberB1);
+	
+	//test the BigInt::operator std::string() const
+	strNum = myNumberG1;
+	test(strNum, myNumberG1);
 	
 	//test overloaded assignment operator with right number bigger
 	myNumberA = myNumberB;
@@ -262,6 +268,8 @@ void TestBigIntFunctions()
 	a.SetPowerMod(b, 5);
 	cout << a << endl;
 	test(a, 2);
+	a = "22";
+	test(a.GetPowerMod("6", "37"), "27");
 	
 	//test ToString()
 	a = "10000000000";
@@ -608,9 +616,9 @@ void TestBigIntOperators()
 		test(a % b, "2");
 		
 		a = "-10"; b = "-3";
-		test(a % b, 1);
+		test(a % b, "-1");
 		b = "3";
-		test(a % b, "1");
+		test(a % b, "-1");
 		a = 10;
 		test(a % b, 1);
 		b = "-3";
@@ -885,19 +893,63 @@ void TestKeyGeneration(unsigned long int testCount)
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
 		cout << i << ". " << endl;
-		KeyPair newKeyPair(RSA::GenerateKeyPair(10));
-		cout << "Private Key" << endl;
-		cout << "\tModulus: \t" 
-		<< newKeyPair.GetPrivateKey().GetModulus() << endl;
-		cout << "\tExponent: \t" 
-		<< newKeyPair.GetPrivateKey().GetExponent() << endl << endl;
-		cout << "Public Key" << endl;
-		cout << "\tModulus: \t" 
-		<< newKeyPair.GetPublicKey().GetModulus() << endl;
-		cout << "\tExponent: \t" 
-		<< newKeyPair.GetPublicKey().GetExponent() << endl;
-		cout << endl << endl;
+		KeyPair newKeyPair(RSA::GenerateKeyPair(50));
+		cout << newKeyPair << endl;
 	}
 	
 	cout << "\nKey generation test finished!" << endl;
+}
+
+/*				ENCRYPTION/DECRYPTION TEST				*/
+void TestEncryptionDecryption(unsigned long int testCount)
+{
+	cout << "\n\n\tENCRYPTION/DECRYPTION TEST\n\n";
+	cout << "Preparing to do " << testCount << " tests." << endl << endl;
+	
+	cout << "Generating keypair... ";
+	KeyPair newKeyPair(RSA::GenerateKeyPair(6));
+	std::string message("Ja ti on ona ono mi vi oni one ona. Halo. Hej! oea o ejfaodsnf aeihfwor249 ygnaeg985yt[5]trog][f gkq34] ahrghfjg4-[h tDW 	892H1 PHQO02H[Q0 [	 u	[u	0u [0ur[i	0it]3-9t 3- 6u5]5\n\t\0egnb50hue");
+	cout << "\n\n" << newKeyPair << "\n\ndone!" << endl
+			<< "Encrypting the message: \"" << message << "\"... \n";
+	for (unsigned long int i = 1; i <= testCount; i++)
+	{
+		cout << i << ".\nEncrypting the message... ";
+		
+		std::string cypherText = RSA::Encrypt(	message, 
+												newKeyPair.GetPublicKey());
+		cout << "done!\nDecrypting the message... ";
+		std::string newMessage = RSA::Decrypt(	cypherText, 
+												newKeyPair.GetPrivateKey());
+		cout << "done!\n" << endl;
+		test(message, newMessage);
+	}
+	
+	cout << "\nEncryption/decryption test finished!" << endl;
+}
+
+/*				FILE ENCRYPTION/DECRYPTION TEST			*/
+void TestFileEncryptionDecryption(unsigned long int testCount)
+{
+	cout << "\n\n\tFILE ENCRYPTION/DECRYPTION TEST\n\n";
+	cout << "Preparing to do " << testCount << " tests." << endl << endl;
+	
+	cout << "Generating keypair... ";
+	KeyPair newKeyPair(RSA::GenerateKeyPair(12));
+	cout << "\n\n" << newKeyPair << "\n\ndone!" << endl;
+	char messageFile[] = "/home/nedim/Desktop/a";
+	char cypherFile[] = "/home/nedim/Desktop/b";
+	char destFile[]	= "/home/nedim/Desktop/c";
+	cout << "Encrypting the file: \"" << messageFile << "\"... \n";
+	for (unsigned long int i = 1; i <= testCount; i++)
+	{
+		cout << i << ".\nEncrypting the file... ";
+		
+		RSA::Encrypt(messageFile, cypherFile, newKeyPair.GetPublicKey());
+		cout << "done!\nDecrypting the file... ";
+		RSA::Decrypt(cypherFile, destFile, newKeyPair.GetPrivateKey());
+		cout << "done!\n" << endl;
+//		test(message, newMessage);
+	}
+	
+	cout << "\nFile encryption/decryption test finished!" << endl;
 }

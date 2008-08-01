@@ -44,13 +44,14 @@
  * 	- multiplication 			(*, *=)
  * 		For multiplication, one can choose between the Square and multiply 
  * 		or Karatsuba algorithm, or long multiplication at compile time 
- * 		(this can be done by defining or undefining the macro "KARATSUBA").
+ * 		(this can be done by defining or undefining the macro "KARATSUBA"
+ * 		in BigInt.cpp).
  * 		The Karatsuba algorithm multiplies integers in O(n^log2(3)) 
  * 		complexity. log2(3) is approximately 1.585, so this should be 
  * 		significantly faster than long multiplication, if the numbers are 
- * 		big enough. I haven't tested this too much. Currently, the long 
- * 		multiplication is better implemented, and runs faster than the 
- * 		Karatsuba multiplication for numbers shorter than about 100 digits. 
+ * 		big enough. Currently, the long multiplication is better implemented, 
+ * 		and runs faster than the Karatsuba multiplication for numbers shorter 
+ * 		than about 100 digits. 
  * 
  * 	- C-style integer division 	(/, /=)
  * 		Division is pretty slow. I hope to speed this up in the future. 
@@ -71,13 +72,17 @@
  * 
  * In addition to mathematical operations, BigInt supports: 
  * 
- * 	- automatic conversion from const char * and unsigned long int 
+ * 	- automatic conversion from const char *, std::string and unsigned long int 
  * 	- safe construction, copying, assignment and destruction 
+ * 	- automatic conversion to std::string 
  * 	- writing to the standard output (operator <<(std::ostream, BigInt))
+ * 	- reading from the standard input (operator >>(std::istream, BigInt))
  * 	- returning nth digit (operator[])
  * 	- returning the number of digits (Length())
  * 	- returning a string of digits (ToString())
  * 		This can be useful for human-readable output. 
+ * 	- returning a value indicating wether the number is odd (IsOdd())
+ * 	- returning a value indicating wether the number is positive (IsPositive())
  * 	- returning a value indicating wether the BigInt equals zero (EqualsZero())
  * 		The fastest way to determine this.
  * 	- returning absolute value (Abs()) 
@@ -95,15 +100,16 @@
 #ifndef BIGINT_H_
 #define BIGINT_H_
 
-#include <iostream>	//ostream
+#include <iostream>	//ostream, istream
 #include <cmath>	//sqrt()
-#include <string>	//ToString()
+#include <string>	//ToString(), BigInt(std::string)
 
 class BigInt
 {
 	private:
 		// For optimization purposes
 		friend class PrimeGenerator;
+		friend class RSA;
 		/* An array of digits stored right to left,
 		* i.e. int 345 = unsigned char {[5], [4], [3]} */
 		unsigned char *digits;
@@ -175,11 +181,15 @@ class BigInt
 		BigInt();
 		BigInt(const char *charNum);
 		BigInt(unsigned long int intNum);
+		BigInt(const std::string &str);
 		BigInt(const BigInt &number);
 		BigInt &operator =(const BigInt &rightNumber);
 		~BigInt();
+		operator std::string() const;
 		friend std::ostream &operator <<(	std::ostream &cout, 
 											const BigInt &number);
+		friend std::istream &operator >>(	std::istream &cin, 
+											BigInt &number);
 		friend bool operator <(const BigInt &a, const BigInt &b);
 		friend bool operator <=(const BigInt &a, const BigInt &b);
 		friend bool operator >(const BigInt &a, const BigInt &b);
@@ -218,8 +228,12 @@ class BigInt
 		void SetPowerMod(const BigInt &b, const BigInt &n);
 		/* Returns the nth digit. */
 		unsigned char operator [](unsigned long int n) const;
-		/* Returns the number of digits*/
+		/* Returns the number of digits. */
 		unsigned long int Length() const;
+		/* Returns true if *this is positive, otherwise false. */
+		bool IsPositive() const;
+		/* Returns true if *this is odd, otherwise false. */
+		bool IsOdd() const;
 		/* Returns the value of BigInt as std::string. */
 		std::string ToString(bool forceSign = false) const;
 		/* Returns a value indicating whether *this equals 0. */
@@ -242,6 +256,18 @@ inline BigInt &BigInt::operator+()
 inline unsigned long int BigInt::Length() const
 {
 	return digitCount;
+}
+
+/* Returns true if *this is positive, otherwise false. */
+inline bool BigInt::IsPositive() const
+{
+	return positive;
+}
+
+/* Returns true if *this is odd, otherwise false. */
+inline bool BigInt::IsOdd() const
+{
+	return digits[0] & 1;
 }
 
 /* Returns a value indicating whether *this equals 0. */

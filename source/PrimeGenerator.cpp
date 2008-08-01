@@ -29,8 +29,8 @@ static const BigInt ULongMax(ULONG_MAX);
 void PrimeGenerator::MakeRandom(BigInt &number, unsigned long int digitCount)
 {
 	//make sure there is enough space
-	if (number.length < digitCount + RandMax.digitCount + 10)
-		number.expandTo(digitCount + RandMax.digitCount + 10);
+	if (number.length < digitCount + RandMax.digitCount)
+		number.expandTo(digitCount + RandMax.digitCount);
 
 	unsigned long int tempDigitCount(0);
 
@@ -49,7 +49,7 @@ void PrimeGenerator::MakeRandom(BigInt &number, unsigned long int digitCount)
 		}
 	}
 
-	//adjust the digitCount property of a to the required number of digits
+	//adjust the digitCount property to the required number of digits
 	number.digitCount = digitCount;
 	//make sure the leading digit is not zero
 	if (number.digits[number.digitCount - 1] == 0)
@@ -63,8 +63,8 @@ void PrimeGenerator::makeRandom(BigInt &number, const BigInt &top)
 	//randomly select the number of digits for the random number
 	unsigned long int newDigitCount = (rand() % top.digitCount) + 1;
 	MakeRandom(number, newDigitCount);
-	//make sure the number is < top and not zero
-	while (number >= top || number.EqualsZero())
+	//make sure number < top
+	while (number >= top)
 		MakeRandom(number, newDigitCount);
 }
 

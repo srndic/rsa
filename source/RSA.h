@@ -11,7 +11,7 @@
  * 
  * 	- Message encryption 
  * 	- Message decryption 
- * 	- Public/private key-pair generation 
+ * 	- Public/private keypair generation 
  * 
  * NOTE: it is highly recommended to call 
  * 		std::srand(time(NULL));
@@ -28,6 +28,7 @@
 #define RSA_H_
 
 #include <string>
+#include <fstream>
 #include "KeyPair.h"
 #include "Key.h"
 #include "BigInt.h"
@@ -53,20 +54,50 @@ class RSA
 		static BigInt solveModularLinearEquation(	const BigInt &a, 
 													const BigInt &b, 
 													const BigInt &n);
+		/* Throws an exception if "key" is too short to be used. */
+		static void checkKeyLength(const Key &key);
+		/* Transforms a std::string message into a BigInt message. */
+		static BigInt encode(const std::string &message);
+		/* Transforms a BigInt cyphertext into a std::string cyphertext. */
+		static std::string decode(const BigInt &message);
+		/* Encrypts a "chunk" (a small part of a message) using "key" */
+		static std::string encryptChunk(const std::string &chunk, 
+										const Key &key);
+		/* Decrypts a "chunk" (a small part of a message) using "key" */
+		static std::string decryptChunk(const BigInt &chunk, 
+										const Key &key);
+		/* Encrypts a string "message" using "key". */
+		static std::string encryptString(	const std::string &message, 
+											const Key &key);
+		/* Decrypts a string "message" using "key". */
+		static std::string decryptString(	const std::string &cypherText, 
+											const Key &key);
+		/* Tests the file for 'eof', 'bad ' errors and throws an exception. */
+		static void fileError(bool eof, bool bad);
 	public:
-		/* Encrypts "message" using "key". */
-		static const std::string &Encrypt(	const std::string message, 
-											const Key &key);
-		/* Decrypts "cyphertext" using "key". */
-		static const std::string &Decrypt(	const std::string cyphertext, 
-											const Key &key);
-		/* Generates a public/private key-pair. The keys are retured in a 
+		/* Returns the string "message" RSA-encrypted using the key "key". */
+		static std::string Encrypt(	const std::string &message, 
+									const Key &key);
+		/* Encrypts the file "sourceFile" using the key "key" and saves 
+		 * the result into the file "destFile". */
+		static void Encrypt(const char *sourceFile, 
+							const char *destFile, 
+							const Key &key);
+		/* Decrypts the file "sourceFile" using the key "key" and saves 
+		 * the result into the file "destFile". */
+		static void Decrypt(const char *sourceFile, 
+							const char *destFile, 
+							const Key &key);
+		/* Returns the string "cypherText" RSA-decrypted 
+		 * using the key "key". */
+		static std::string Decrypt(	const std::string &cypherText, 
+									const Key &key);
+		/* Generates a public/private keypair. The keys are retured in a 
 		 * KeyPair. The generated keys are 
 		 * 2 * "digitCount" or 2 * "digitCount - 1 digits long, 
 		 * and have the probability of at least 1 - 4^(-k) of being prime. 
 		 * For k = 3, that probability is 98.4375%, 
 		 * and for k = 4 it is 99.609375%. 
-		 * 
 		 * k = 3 is recommended by Introduction to Algorithms, Second Edition;
 		 * by Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and 
 		 * Clifford Stein for prime number generation. 

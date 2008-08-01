@@ -21,8 +21,6 @@
  * 		they can be converted to unsigned long int and safely multiplied 
  * 		by the CPU. This is platform-specific. 
  * 
- * 	TODO:	comment some uncommented code
- * 
  * ****************************************************************************
  */
 
@@ -33,6 +31,7 @@
 #include <cstring>	//strlen()
 #include <climits>	//ULONG_MAX
 #include <vector>	//vector<bool>
+#include <string>	//operator std::string()
 #include <algorithm>    //reverse_copy(), copy(), copy_backward(), 
 						//fill(), fill_n()
 
@@ -391,7 +390,7 @@ BigInt &BigInt::shiftLeft(unsigned long int n)
 BigInt &BigInt::shiftRight(unsigned long int n)
 {
 	if (n >= digitCount)
-		throw "Error 00: Overflow on shift right.";
+		throw "Error BIGINT00: Overflow on shift right.";
 	
 	std::copy_backward(	digits + n, digits + digitCount, 
 						digits + digitCount - n);
@@ -414,7 +413,7 @@ void BigInt::expandTo(unsigned long int n)
 		delete[] digits;
 		digits = oldDigits;
 		length = oldLength;
-		throw "Error 01: BigInt creation error (out of memory?).";
+		throw "Error BIGINT01: BigInt creation error (out of memory?).";
 	}
 
 	std::copy(oldDigits, oldDigits + digitCount, digits);
@@ -430,7 +429,7 @@ BigInt::BigInt() : digits(0), length(10), digitCount(1), positive(true)
     catch (...)
     {
     	delete[] digits;
-        throw "Error 02: BigInt creation error (out of memory?).";
+        throw "Error BIGINT02: BigInt creation error (out of memory?).";
     }
 
     //initialize to 0
@@ -442,7 +441,7 @@ BigInt::BigInt(const char * charNum) : digits(0)
 	digitCount = strlen(charNum);
 
 	if (digitCount == 0)
-	    throw "Error 03: Input string empty.";
+	    throw "Error BIGINT03: Input string empty.";
 	else 
 	{
 		switch (charNum[0])
@@ -471,10 +470,11 @@ BigInt::BigInt(const char * charNum) : digits(0)
 
 	//check if the string contains only decimal digits
 	if (! BigInt::allCharsAreDigits(charNum, digitCount))
-	    throw "Error 04: Input string contains characters other than digits.";
+	    throw "Error BIGINT04: Input string contains characters"
+	    " other than digits.";
 		
 	//the input string was like ('+' or '-')"00...00\0"
-	if (charNum[0] == 0)
+	if (charNum[0] == '\0')
 	{
 		digitCount = 1;
 		charNum--;
@@ -490,7 +490,7 @@ BigInt::BigInt(const char * charNum) : digits(0)
 	catch (...)
 	{
 		delete[] digits;
-		throw "Error 05: BigInt creation error (out of memory?).";
+		throw "Error BIGINT05: BigInt creation error (out of memory?).";
 	}
 
 	//copy the digits backwards to the new BigInt
@@ -524,10 +524,29 @@ BigInt::BigInt(unsigned long int intNum) : digits(0)
 	catch (...)
 	{
 		delete [] digits;
-		throw "Error 06: BigInt creation error (out of memory?).";
+		throw "Error BIGINT06: BigInt creation error (out of memory?).";
 	}
 
 	std::copy(tempDigits, tempDigits + digitCount, digits);
+}
+
+BigInt::BigInt(const std::string &str) : 	digits(0), length(10), 
+											digitCount(1), positive(true)
+{
+    try
+    {
+        digits = new unsigned char[length];
+    }
+    catch (...)
+    {
+    	delete[] digits;
+        throw "Error BIGINT07: BigInt creation error (out of memory?).";
+    }
+
+    //initialize to 0
+    digits[0] = 0;
+	BigInt a(str.c_str());
+	*this = a;
 }
 
 BigInt::BigInt(const BigInt &rightNumber) : length(rightNumber.length),
@@ -543,10 +562,15 @@ digitCount(rightNumber.digitCount), positive(rightNumber.positive)
 	catch (...)
 	{
 		delete[] digits;
-		throw "Error 07: BigInt creation error (out of memory?).";
+		throw "Error BIGINT08: BigInt creation error (out of memory?).";
 	}
 
 	std::copy(rightNumber.digits, rightNumber.digits + digitCount, digits);
+}
+
+BigInt::operator std::string() const
+{
+	return ToString();
 }
 
 BigInt &BigInt::operator =(const BigInt &rightNumber)
@@ -570,7 +594,7 @@ BigInt &BigInt::operator =(const BigInt &rightNumber)
 			delete[] digits;
 			//restore the digits
 			digits = tempDigits;
-			throw "Error 08: BigInt assignment error (out of memory?).";
+			throw "Error BIGINT09: BigInt assignment error (out of memory?).";
 		}
 		//it turns out we don't need this any more
 		delete[] tempDigits;
@@ -594,6 +618,20 @@ std::ostream &operator <<(std::ostream &cout, const BigInt &number)
         cout << (int(number.digits[i]));
 
 	return cout;
+}
+
+std::istream &operator >>(std::istream &cin, BigInt &number)
+{
+	std::string newNumber;
+	std::cin >> std::ws >> newNumber;
+	if (!cin)
+	{
+		cin.clear();
+		throw "Error BIGINT16: Input stream error.";
+	}
+	
+	number = newNumber;
+	return cin;
 }
 
 bool operator <(const BigInt &a, const BigInt &b)
@@ -706,9 +744,13 @@ BigInt &BigInt::operator+=(const BigInt &number)
 
 BigInt BigInt::operator-() const
 {
-	BigInt temp(*this);
-	temp.positive = !temp.positive;
-	return temp;
+	if (!this->EqualsZero())
+	{
+		BigInt temp(*this);
+		temp.positive = !temp.positive;
+		return temp;
+	}
+	return *this;
 }
 
 BigInt operator-(const BigInt &a, const BigInt &b)
@@ -833,7 +875,7 @@ BigInt operator*(const BigInt &a, const BigInt &b)
 	catch (...)
 	{
 		delete[] buffer;
-		throw "Error 09: Not enough memory?";
+		throw "Error BIGINT10: Not enough memory?";
 	}
 	
 	unsigned char *bb(buffer + n), *bc(bb + n);
@@ -886,7 +928,7 @@ BigInt &BigInt::operator*=(const BigInt &number)
 BigInt operator /(const BigInt &a, const BigInt &b)
 {
 	if (b.EqualsZero())
-		throw "Error 10: Attempt to divide by zero.";
+		throw "Error BIGINT11: Attempt to divide by zero.";
 		
 	//we don't want to call this function twice
 	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
@@ -920,7 +962,7 @@ BigInt &BigInt::operator /=(const BigInt &number)
 BigInt operator%(const BigInt &a, const BigInt &b)
 {
 	if (b.EqualsZero())
-		throw "Error 11: Attempt to divide by zero.";
+		throw "Error BIGINT12: Attempt to divide by zero.";
 		
 	//we don't want to call this function twice
 	int comparison(BigInt::compareNumbers(	a.digits, a.digitCount, 
@@ -936,6 +978,8 @@ BigInt operator%(const BigInt &a, const BigInt &b)
 		
 	BigInt quotient, remainder;
 	BigInt::divide(a, b, quotient, remainder);
+	if (!a.positive && !remainder.EqualsZero())
+		remainder.positive = false;
 	return remainder;
 }
 							
@@ -981,7 +1025,7 @@ void BigInt::SetPower(unsigned long int n)
 BigInt BigInt::GetPower(BigInt n) const
 {
 	if (!n.positive)
-		throw "Error 12: Negative exponents not supported!";
+		throw "Error BIGINT13: Negative exponents not supported!";
 	
 	BigInt result(BigIntOne);
 	BigInt base(*this);
@@ -1022,6 +1066,8 @@ BigInt BigInt::GetPowerMod(const BigInt &b, const BigInt &n) const
 /* *this = (*this to the power of b) mod n. */
 void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
 {
+	if (!b.positive)
+		throw "Error BIGINT14: Negative exponent not supported.";
 	//we will need this value later, since *this is going to change
 	const BigInt a(*this);
 	//temporary variables
@@ -1054,7 +1100,7 @@ void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
 unsigned char BigInt::operator [](unsigned long int n) const
 {
 	if (n >= digitCount)
-		throw "Error 13: Index out of range.";
+		throw "Error BIGINT15: Index out of range.";
 		
 	return digits[digitCount - n - 1];
 }
@@ -1062,22 +1108,17 @@ unsigned char BigInt::operator [](unsigned long int n) const
 /* Returns the value of BigInt as std::string. */
 std::string BigInt::ToString(bool forceSign) const
 {
-	std::string bigIntStr(digits, digits + digitCount);
-	
-	for (unsigned long int i(0); i < digitCount; i++)
-		bigIntStr[i] = digits[i] + '0';
-	
+	std::string number;
 	if (!positive)
-		bigIntStr.append("-");
-	else if (forceSign)
-		bigIntStr.append("+");
+		number.push_back('-');
+	for (int i = digitCount - 1; i >= 0; i--)
+		number.push_back(char(digits[i]) + '0');
 	
-	std::reverse(bigIntStr.begin(), bigIntStr.end());
-	return bigIntStr;
+	return number;
 }
 
 /* Returns the absolute value. */
 BigInt BigInt::Abs() const
 {
-	return ((this->positive) ? *this : -(*this)); 
+	return ((positive) ? *this : -(*this)); 
 }

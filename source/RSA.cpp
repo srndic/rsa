@@ -299,14 +299,10 @@ void RSA::Decrypt(	const char *sourceFile, const char *destFile,
 
 /* Generates a public/private keypair. The keys are retured in a 
  * KeyPair. The generated keys are 
- * 2 * "digitCount" or 2 * "digitCount - 1 digits long, 
+ * 2 * "digitCount" or 2 * "digitCount" - 1 digits long, 
  * and have the probability of at least 1 - 4^(-k) of being prime. 
  * For k = 3, that probability is 98.4375%, 
  * and for k = 4 it is 99.609375%. 
- * 
- * k = 3 is recommended by Introduction to Algorithms, Second Edition;
- * by Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and 
- * Clifford Stein for prime number generation. 
  * */
 KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount, 
 								unsigned long int k)
@@ -328,9 +324,8 @@ KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount,
 	BigInt phi((p - BigIntOne) * (q - BigIntOne));
 	
 	//we don't want the keys to be less than 20 bits long
-	//TODO: restore
-//	if (phi < "1048576")
-//		throw "Error RSA04: Insufficient key strength!";
+	if (phi < "1048576")
+		throw "Error RSA10: Insufficient key strength!";
 	
 	//select a small odd integer e that is coprime with phi and e < phi
 	//usually 65537 is used, and we will use it too if it fits

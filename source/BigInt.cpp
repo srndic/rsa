@@ -7,7 +7,7 @@
  * 
  * This file contains the implementation for the BigInt class.
  * 
- * There are a few static constants defined in this file: 
+ * There are two static constants defined in this file: 
  * 
  * - ULongMax		: ULONG_MAX (defined in climits) of type BigInt
  * 		Mainly used for speedup in the multiply() private member function. 
@@ -87,7 +87,7 @@ bool BigInt::allCharsAreDigits(	const char *array,
 
 /* Compares two BigInt. If the last two arguments are 
  * omitted, the comparison is sign-insensitive (comparison by 
- * absolute value). */
+ * absolute value). Returns 0 if a == b, 1 if a > b, 2 if a < b. */
 int BigInt::compareNumbers(	unsigned char *a, unsigned long int na,      
 		                    unsigned char *b, unsigned long int nb,
 		                    bool aPositive, bool bPositive)
@@ -159,7 +159,7 @@ void BigInt::karatsubaMultiply(	unsigned char *a, unsigned char *b,
 	std::fill(a + (nl << 1) + 1, t1, 0);
 	
 	//shifted p3 -= p2
-	//a == shifted p3, b == p2
+	//a = shifted p3, b = p2
 	BigInt::quickSub(a, t1 + (nh << 1), t1, nl);
 	
 	//shifted p3 -= p1
@@ -923,8 +923,6 @@ BigInt &BigInt::operator*=(const BigInt &number)
 	return *this;
 }
 
-/* Overloaded division operator. 
- * Works according to the formula leftNum == Z * rightNum + L*/
 BigInt operator /(const BigInt &a, const BigInt &b)
 {
 	if (b.EqualsZero())

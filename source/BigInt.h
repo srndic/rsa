@@ -27,19 +27,15 @@
  * copying from an other BigInt with (digitCount + 2 <= length) 
  * (soon to be full), new memory is allocated and 
  * length is adjusted to (length * factor + 1). This is done to expand the 
- * capacity of the digits array to accomodate potential newcomer digits. 
+ * capacity of the digits array to accomodate potential new digits. 
  * When assigning a BigInt "bInt" that is twice as small or bigger than *this, 
  * the length is set to (bInt.length + 2). 
  * 
  * BigInt supports: 
  * 
  * 	- addition 					(unary +, binary +, +=, prefix ++, postfix ++)
- * 		If you can, use prefix ++ insted of postfix ++ because of much greater
- * 		performance. 
  * 
- * 	- subtraction 				(binary -, -=, prefix --, postfix --)
- * 		If you can, use prefix -- insted of postfix -- because of greater
- * 		performance. 
+ * 	- subtraction 				(unary -, binary -, -=, prefix --, postfix --)
  * 
  * 	- multiplication 			(*, *=)
  * 		For multiplication, one can choose between the Square and multiply 
@@ -54,12 +50,9 @@
  * 		than about 100 digits. 
  * 
  * 	- C-style integer division 	(/, /=)
- * 		Division is pretty slow. I hope to speed this up in the future. 
  * 
  * 	- C-style integer division remainder (%, %=)
- * 		When calculating the remainder, the number is first divided. I'm
- * 		not sure if this can be done any smarter. I hope to
- * 		speed this up in the future. 
+ * 		When calculating the remainder, the number is first divided. 
  * 
  * 	- comparison 				(==, !=, <, <=, >, >=)
  * 		All of the <, <=, >, >= operators are equally fast. 
@@ -72,7 +65,7 @@
  * 
  * In addition to mathematical operations, BigInt supports: 
  * 
- * 	- automatic conversion from const char *, std::string and unsigned long int 
+ * 	- automatic conversion from const char *, std::string and unsigned long int
  * 	- safe construction, copying, assignment and destruction 
  * 	- automatic conversion to std::string 
  * 	- writing to the standard output (operator <<(std::ostream, BigInt))
@@ -135,7 +128,7 @@ class BigInt
 										unsigned long int length);
 		/* Compares two BigInt. If the last two arguments are 
 		 * omitted, the comparison is sign-insensitive (comparison by 
-		 * absolute value). */ 
+		 * absolute value). Returns 0 if a == b, 1 if a > b, 2 if a < b. */ 
 		static int compareNumbers(	unsigned char *a, unsigned long int na,
 		                            unsigned char *b, unsigned long int nb, 
 		                            bool aPositive = true, 
@@ -202,7 +195,7 @@ class BigInt
 		BigInt operator++(int);
 		BigInt &operator+=(const BigInt &number);
 		BigInt operator-() const;
-		friend BigInt operator - (const BigInt &a, const BigInt &b);
+		friend BigInt operator-(const BigInt &a, const BigInt &b);
 		BigInt &operator--();
 		BigInt operator--(int);
 		BigInt &operator-=(const BigInt &number);

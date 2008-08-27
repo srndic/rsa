@@ -98,6 +98,9 @@ class RSA
 		 * and have the probability of at least 1 - 4^(-k) of being prime. 
 		 * For k = 3, that probability is 98.4375%, 
 		 * and for k = 4 it is 99.609375%. 
+		 * k = 3 is recommended by Introduction to Algorithms, Second Edition;
+		 * by Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and 
+		 * Clifford Stein for prime number generation. 
 		 * */
 		static KeyPair GenerateKeyPair(	unsigned long int digitCount, 
 										unsigned long int k = 3);

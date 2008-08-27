@@ -774,6 +774,7 @@ void RandomBigIntTest(unsigned long int testCount)
 				break;
 			case 11:
 				m = myRand();	n = myRand(m);
+
 				a = m;	b = n;
 				cout << "a = " << a << endl << "b = " << b << endl;
 				cout << "TESTING a - b";
@@ -834,7 +835,7 @@ void RandomBigIntTest(unsigned long int testCount)
 				a = m;
 				cout << "a = " << a << endl << "n = " << n << endl;
 				cout << "TESTING a.Power(n)";
-				double temp(pow(m,n));
+				double temp(pow((double) m, (double) n));
 				unsigned long int power;
 				if (temp - floor(temp) < ceil(temp) - temp)
 					power = static_cast<unsigned long int>(floor(temp));
@@ -933,7 +934,7 @@ void TestFileEncryptionDecryption(unsigned long int testCount)
 	
 	cout << "Generating keypair... ";
 	KeyPair newKeyPair(RSA::GenerateKeyPair(12));
-	cout << "\n\n" << newKeyPair << "\n\ndone!" << endl;
+	cout << "\n\n" << newKeyPair << "\n\ndone!" << endl; 
 	char messageFile[] = "/home/nedim/Desktop/a";
 	char cypherFile[] = "/home/nedim/Desktop/b";
 	char destFile[]	= "/home/nedim/Desktop/c";

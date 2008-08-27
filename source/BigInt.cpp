@@ -45,7 +45,7 @@ const double BigInt::factor = 1.6;
 static const BigInt ULongMax(ULONG_MAX);
 //A BigInt number with the value of sqrt(ULONG_MAX)
 static const BigInt SqrtULongMax
-				(static_cast<unsigned long int>(sqrt(ULONG_MAX)));
+				(static_cast<unsigned long int>(sqrt(static_cast<double>(ULONG_MAX))));
 
 /* Transforms the number from unsigned long int to unsigned char[]
  * and pads the result with zeroes. Returns the number of digits. */
@@ -58,7 +58,7 @@ unsigned long int BigInt::int2uchar(unsigned long int number,
 	{
 		//the number is stored in reverse
 		//(i.e. long int 456 is stored as unsigned char[] {[6][5][4]})
-		digits[i++] = number % 10;
+		digits[i++] = (unsigned char) (number % 10);
 		number /= 10;
 	} while (number > 0);
 	
@@ -438,7 +438,7 @@ BigInt::BigInt() : digits(0), length(10), digitCount(1), positive(true)
 
 BigInt::BigInt(const char * charNum) : digits(0)
 {
-	digitCount = strlen(charNum);
+	digitCount = (unsigned long int) strlen(charNum);
 
 	if (digitCount == 0)
 	    throw "Error BIGINT03: Input string empty.";
@@ -500,14 +500,8 @@ BigInt::BigInt(const char * charNum) : digits(0)
 }
 
 BigInt::BigInt(unsigned long int intNum) : digits(0)
-{		
-	if (intNum < 0)
-	{
-		positive = false;
-		intNum = -intNum;
-	}
-	else
-		positive = true;
+{
+	positive = true;
 	
 	//we don't know how many digits there are in intNum since
 	//sizeof(long int) is platform dependent (2^128 ~ 39 digits), so we'll
@@ -1086,7 +1080,7 @@ void BigInt::SetPowerMod(const BigInt &b, const BigInt &n)
 	
 	//do the exponentiating
 	*this = BigIntOne;
-	for (int i = bits.size() - 1; i >= 0; i--)
+	for (int i = (int) bits.size() - 1; i >= 0; i--)
 	{
 		BigInt::divide(*this * *this, n, q, *this);
 		if (bits[i])

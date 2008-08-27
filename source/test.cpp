@@ -7,8 +7,6 @@
  * 
  * A collection of test code, used to test the functionality of other classes.
  * 
- * TODO: test IsOdd(), IsPositive() 
- * 
  * ****************************************************************************
  */
 
@@ -893,7 +891,7 @@ void TestKeyGeneration(unsigned long int testCount)
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
 		cout << i << ". " << endl;
-		KeyPair newKeyPair(RSA::GenerateKeyPair(50));
+		KeyPair newKeyPair(RSA::GenerateKeyPair(20));
 		cout << newKeyPair << endl;
 	}
 	

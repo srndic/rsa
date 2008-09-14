@@ -26,7 +26,7 @@
  * When creating a BigInt from const char* or unsigned long int, 
  * copying from an other BigInt with (digitCount + 2 <= length) 
  * (soon to be full), new memory is allocated and 
- * length is adjusted to (length * factor + 1). This is done to expand the 
+ * length is adjusted to (length * FACTOR + 1). This is done to expand the 
  * capacity of the digits array to accomodate potential new digits. 
  * When assigning a BigInt "bInt" that is twice as small or bigger than *this, 
  * the length is set to (bInt.length + 2). 
@@ -70,7 +70,7 @@
  * 	- automatic conversion to std::string 
  * 	- writing to the standard output (operator <<(std::ostream, BigInt))
  * 	- reading from the standard input (operator >>(std::istream, BigInt))
- * 	- returning nth digit (operator[])
+ * 	- getting and setting individual digits (GetDigit(), SetDigit())
  * 	- returning the number of digits (Length())
  * 	- returning a string of digits (ToString())
  * 		This can be useful for human-readable output. 
@@ -100,9 +100,6 @@
 class BigInt
 {
 	private:
-		// For optimization purposes
-		friend class PrimeGenerator;
-		friend class RSA;
 		/* An array of digits stored right to left,
 		* i.e. int 345 = unsigned char {[5], [4], [3]} */
 		unsigned char *digits;
@@ -114,7 +111,7 @@ class BigInt
 		bool positive;
 		/* Multiplication factor for the length property
 		 * when creating or copying objects. */
-		static const double factor;
+		static const double FACTOR;
 		/* Transforms the number from unsigned long int to unsigned char[]
 		 * and pads the result with zeroes. Returns the number of digits. */
 		static unsigned long int int2uchar(	unsigned long int number, 
@@ -163,7 +160,6 @@ class BigInt
 					unsigned char *longer, unsigned long int nLonger, 
 					unsigned char *result, int nResult, 
 					bool doFill = true);
-		
 		/* Shifts the digits n places left. */
 		BigInt &shiftLeft(unsigned long int n);
 		/* Shifts the digits n places right. */
@@ -219,8 +215,11 @@ class BigInt
 		BigInt GetPowerMod(const BigInt &b, const BigInt &n) const;
 		/* *this = (*this to the power of b) mod n. */
 		void SetPowerMod(const BigInt &b, const BigInt &n);
-		/* Returns the nth digit. */
-		unsigned char operator [](unsigned long int n) const;
+		/* Returns the 'index'th digit (zero-based, right-to-left). */
+		unsigned char GetDigit(unsigned long int index) const;
+		/* Sets the value of 'index'th digit 
+		 * (zero-based, right-to-left) to 'value'. */
+		void SetDigit(unsigned long int index, unsigned char value);
 		/* Returns the number of digits. */
 		unsigned long int Length() const;
 		/* Returns true if *this is positive, otherwise false. */
@@ -272,7 +271,7 @@ inline bool BigInt::EqualsZero() const
 // A BigInt number with the value of 0. 
 static const BigInt BigIntZero;
 // A BigInt number with the value of 1. 
-static const BigInt BigIntOne(1);
+static const BigInt BigIntOne(1L);
 
 
 #endif /*BIGINT_H_*/

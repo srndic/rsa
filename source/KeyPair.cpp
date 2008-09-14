@@ -15,8 +15,6 @@
 std::ostream &operator <<(std::ostream &cout, const KeyPair &k)
 {
 	return std::cout 
-	<< "Private key:\n\tModulus: " << k.GetPrivateKey().GetModulus() 
-	<< "\n\tExponent: " << k.GetPrivateKey().GetExponent() 
-	<< "\n\nPublic key:\n\tModulus: " << k.GetPublicKey().GetModulus() 
-	<< "\n\tExponent: " << k.GetPublicKey().GetExponent();
+	<< "Private key:" << std::endl << k.GetPrivateKey() << std::endl
+	<< "Public key:" << std::endl << k.GetPublicKey();
 }

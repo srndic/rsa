@@ -40,9 +40,10 @@ int main(int argc, char *argv[])
 //		/*				PRIME GENERATOR TEST					*/
 		TestPrimeGenerator(5);
 //		/*				KEY GENERATOR TEST						*/
-		TestKeyGeneration(1);
+		TestKeyGeneration(6);
 		/*				ENCRYPTION/DECRYPTION TEST				*/
-		TestEncryptionDecryption(1);
+//		for (int i = 0; i < 15; i++)
+			TestEncryptionDecryption(1);
 		/*				FILE ENCRYPTION/DECRYPTION TEST			*/
 		TestFileEncryptionDecryption(1);
 	}

@@ -892,7 +892,7 @@ void TestKeyGeneration(unsigned long int testCount)
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
 		cout << i << ". " << endl;
-		KeyPair newKeyPair(RSA::GenerateKeyPair(20));
+		KeyPair newKeyPair(RSA::GenerateKeyPair(15));
 		cout << newKeyPair << endl;
 	}
 	
@@ -906,7 +906,7 @@ void TestEncryptionDecryption(unsigned long int testCount)
 	cout << "Preparing to do " << testCount << " tests." << endl << endl;
 	
 	cout << "Generating keypair... ";
-	KeyPair newKeyPair(RSA::GenerateKeyPair(6));
+	KeyPair newKeyPair(RSA::GenerateKeyPair(15));
 	std::string message("Ja ti on ona ono mi vi oni one ona. Halo. Hej! oea o ejfaodsnf aeihfwor249 ygnaeg985yt[5]trog][f gkq34] ahrghfjg4-[h tDW 	892H1 PHQO02H[Q0 [	 u	[u	0u [0ur[i	0it]3-9t 3- 6u5]5\n\t\0egnb50hue");
 	cout << "\n\n" << newKeyPair << "\n\ndone!" << endl
 			<< "Encrypting the message: \"" << message << "\"... \n";

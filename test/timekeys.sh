@@ -39,6 +39,4 @@ echo >> timekeys.dat;
 ## Display a graph of results.
 scilab -f timekeys.sci;
 
-rm timekeys.dat;
-
 exit 0;

@@ -54,17 +54,6 @@ void testVerbose(const BigInt &a, const BigInt &b)
 		cout << "\t\tTEST OK!" << endl;
 }
 
-//void testVerbose(unsigned long int a, unsigned long int b)
-//{
-//	cout << " = " << a;
-//	if (a != b)
-//	{
-//	cout << ", NOT " << b << "\t\tTEST FAIL!" << endl;
-//		pauseScreenOnError();
-//	}
-//	else
-//		cout << "\t\tTEST OK!" << endl;
-//}
 template <typename T>
 void testVerbose(T a, T b)
 {
@@ -228,15 +217,21 @@ void TestBigIntFunctions()
 	myNumberA = BigIntZero - BigIntOne;
 	test(myNumberA.EqualsZero(), false);
 	
-	//test the operator[]
+	//test GetDigit(), SetDigit()
 	myNumberA = "145";
-	if (myNumberA[0] == 1 && myNumberA[1] == 4 && myNumberA[2] == 5)
-		cout << "operator[] test passed" << endl;
+	if (myNumberA.GetDigit(0) == 5 && myNumberA.GetDigit(1) == 4 
+			&& myNumberA.GetDigit(2) == 1)
+		cout << "GetDigit() test passed" << endl;
 	else
 		pauseScreenOnError();
-//	if (myNumberA[4] == 0)
-//		cout << "operator[] test failed" << endl; //throws "Error 10: Index out of range.";
-
+//	if (myNumberA.GetDigit(3) == 0)	//throws "Error BIGINT14: Index out of range.";
+//		cout << "GetDigit() test failed" << endl; 
+	myNumberA.SetDigit(1, 8);
+	test(myNumberA, 185L);
+//	myNumberA.SetDigit(33, 2);	//throws "Error BIGINT15: Index out of range.";
+//	myNumberA.SetDigit(1, 99);	//throws "Error BIGINT16: Digit value out of range.";
+	
+	
 	//test GetPower(int), SetPower(int), GetPower(BigInt), SetPower(BigInt)
 	BigInt a(2), b(3);
 	cout << a.GetPower(10);
@@ -871,44 +866,57 @@ void RandomBigIntDivisionTest(unsigned long int testCount)
 }
 
 /*				PRIME GENERATOR TEST					*/
-void TestPrimeGenerator(unsigned long int testCount)
+void TestPrimeGenerator(unsigned long int testCount, 
+						unsigned long int digitCount, 
+						unsigned long int iterationCount)
 {
 	cout << "\n\n\tPRIME GENERATOR TEST\n\n";
-	cout << "Preparing to do " << testCount << " tests." << endl << endl;
+	cout << "Preparing to do " << testCount << " tests.\nDigits: " 
+	<< digitCount << "\nIterations: " << iterationCount << endl << endl;
 	
 	for (unsigned long int i = 1; i <= testCount; i++)
-		cout 	<< i << ". " << PrimeGenerator::Generate(10, 3) 
+		cout << i << ". " << PrimeGenerator::Generate(	digitCount, 
+														iterationCount) 
 				<< endl << endl;
 	
 	cout << "\nPrime generator test finished!" << endl;
 }
 
 /*				KEY GENERATOR TEST						*/
-void TestKeyGeneration(unsigned long int testCount)
+void TestKeyGeneration(	unsigned long int testCount, 
+						unsigned long int keyLength)
 {
 	cout << "\n\n\tKEY GENERATION TEST\n\n";
-	cout << "Preparing to do " << testCount << " tests." << endl << endl;
+	cout << "Preparing to do " << testCount << " tests.\nKeylength: " 
+	<< keyLength << endl << endl;
 	
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
 		cout << i << ". " << endl;
-		KeyPair newKeyPair(RSA::GenerateKeyPair(15));
+		KeyPair newKeyPair(RSA::GenerateKeyPair(keyLength));
+		std::string message("aha");
+		std::string cypherText = RSA::Encrypt(	message, 
+												newKeyPair.GetPublicKey());
+		std::string newMessage = RSA::Decrypt(	cypherText, 
+												newKeyPair.GetPrivateKey());
 		cout << newKeyPair << endl;
+		test(message, newMessage);
 	}
 	
 	cout << "\nKey generation test finished!" << endl;
 }
 
 /*				ENCRYPTION/DECRYPTION TEST				*/
-void TestEncryptionDecryption(unsigned long int testCount)
+void TestEncryptionDecryption(	unsigned long int testCount, 
+								unsigned long int keyLength)
 {
 	cout << "\n\n\tENCRYPTION/DECRYPTION TEST\n\n";
-	cout << "Preparing to do " << testCount << " tests." << endl << endl;
+	cout << "Preparing to do " << testCount << " tests.\nKeylength: " 
+	<< keyLength << endl;
 	
-	cout << "Generating keypair... ";
-	KeyPair newKeyPair(RSA::GenerateKeyPair(15));
-	std::string message("Ja ti on ona ono mi vi oni one ona. Halo. Hej! oea o ejfaodsnf aeihfwor249 ygnaeg985yt[5]trog][f gkq34] ahrghfjg4-[h tDW 	892H1 PHQO02H[Q0 [	 u	[u	0u [0ur[i	0it]3-9t 3- 6u5]5\n\t\0egnb50hue");
-	cout << "\n\n" << newKeyPair << "\n\ndone!" << endl
+	KeyPair newKeyPair(RSA::GenerateKeyPair(keyLength));
+	std::string message("Ja ti on ona ono mi vi oni one ona. \n\t\0egnb50hue");
+	cout << "\n" << newKeyPair << "\n\ndone!" << endl
 			<< "Encrypting the message: \"" << message << "\"... \n";
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
@@ -927,17 +935,19 @@ void TestEncryptionDecryption(unsigned long int testCount)
 }
 
 /*				FILE ENCRYPTION/DECRYPTION TEST			*/
-void TestFileEncryptionDecryption(unsigned long int testCount)
+void TestFileEncryptionDecryption(	unsigned long int testCount, 
+									unsigned long int keyLength)
 {
 	cout << "\n\n\tFILE ENCRYPTION/DECRYPTION TEST\n\n";
-	cout << "Preparing to do " << testCount << " tests." << endl << endl;
+	cout << "Preparing to do " << testCount << " tests.\nKeylength: " 
+	<< keyLength << endl << endl;
 	
 	cout << "Generating keypair... ";
-	KeyPair newKeyPair(RSA::GenerateKeyPair(12));
+	KeyPair newKeyPair(RSA::GenerateKeyPair(keyLength));
 	cout << "\n\n" << newKeyPair << "\n\ndone!" << endl; 
-	char messageFile[] = "/home/nedim/Desktop/a";
-	char cypherFile[] = "/home/nedim/Desktop/b";
-	char destFile[]	= "/home/nedim/Desktop/c";
+	char messageFile[] = "test/message.txt";
+	char cypherFile[] = "test/cyphertext.txt";
+	char destFile[]	= "test/new_message.txt";
 	cout << "Encrypting the file: \"" << messageFile << "\"... \n";
 	for (unsigned long int i = 1; i <= testCount; i++)
 	{
@@ -947,7 +957,8 @@ void TestFileEncryptionDecryption(unsigned long int testCount)
 		cout << "done!\nDecrypting the file... ";
 		RSA::Decrypt(cypherFile, destFile, newKeyPair.GetPrivateKey());
 		cout << "done!\n" << endl;
-//		test(message, newMessage);
+		test(system("diff test/message.txt "
+				"test/new_message.txt"), 0);
 	}
 	
 	cout << "\nFile encryption/decryption test finished!" << endl;

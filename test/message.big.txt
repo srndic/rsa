@@ -1,0 +1,46 @@
+Literatura 
+[1]
+R. Rivest, A. Shamir and L. Adleman. A Method for Obtaining Digital Signatures and Public-Key Cryptosystems. Communications of the ACM, 21 (2), pp. 120-126, February 1978. 
+[2]
+T. H. Cormen , C. E. Leiserson , R. L. Rivest and C. Stein . Introduction to Algorithms, Second Edition. The MIT Press , 2001. 
+[3]
+A. Menezes, P. van Oorschot, and S. Vanstone. Handbook of Applied Cryptography. CRC Press, 1996 . 
+[4]
+RSA Laboratories. RSA Laboratories' Frequently Asked Questions About Today's Cryptography, Version 4.1. RSA Security Inc., 2000. 
+[5]
+A. Arnaut. Kriptografija sa javnim ključem. RSA kriptosistem. Prirodno-matematički fakultet u Sarajevu, 1999. 
+[6]
+M.O. Rabin. Probabilistic Algorithm for Primality Testing. Journal of Number Theory. Vol. 12, pp. 128-138. 1980. 
+[7]
+G.L. Miller. Riemann's Hypothesis and Tests for Primality. Journal of Computer Systems Science, Vol. 13, No. 3, pp 300-317. 1976. 
+[8]
+B. C. Higgins. The Rabin- Miller Probabilistic Primality Test: Some Results on the Number of Non-Witnesses to Compositeness. 2003. 
+[9]
+M. Fürer. Faster integer multiplication. Proceedings of the thirty-ninth annual ACM symposium on Theory of computing, pp. 57-66. 2007. 
+[10]
+International Standard 14882:1998 - Programming Language C++. 1998. 
+[11]
+Ž. Jurić. Diskretna matematika, Interna skripta (Udžbenik u pripremi), ETF Sarajevo. 2006. 
+[12]
+W. T. Polk, D. F. Dodson, W. E. Burr. Cryptographic Algorithms and Key Sizes for Personal Identity Verification. NIST. 2007. 
+
+Dodatna literatura 
+[D1]
+History of cryptography 
+http://en.wikipedia.org/w/index.php?title=History_of_cryptography&oldid=228300723 
+[D2]
+RSA 
+http://en.wikipedia.org/w/index.php?title=RSA&oldid=231467735 
+[D3]
+RSA Algorithm 
+http://www.di-mgt.com.au/rsa_alg.html 
+[D4]
+RSA Security 
+http://www.rsasecurity.com/ 
+[D5]
+Miller-Rabin primality test 
+http://en.wikipedia.org/w/index.php?title=Miller%E2%80%93Rabin_primality_test&oldid=232066792
+[D6]
+Primality test 
+http://en.wikipedia.org/w/index.php?title=Primality_test&oldid=229142415 
+

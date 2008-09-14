@@ -41,6 +41,4 @@ echo >> timeprimes.dat;
 ## Display a graph of results.
 scilab -f timeprimes.sci;
 
-rm timeprimes.dat;
-
 exit 0;

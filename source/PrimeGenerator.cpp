@@ -18,50 +18,46 @@
  */
 
 #include "PrimeGenerator.h"
-
-//A BigInt number with the value of RAND_MAX
-static const BigInt RandMax(static_cast<unsigned long int>(RAND_MAX));
-//A BigInt number with the value of ULONG_MAX
-static const BigInt ULongMax(ULONG_MAX);
+#include <string>
 
 /* Generates a random number with digitCount digits.
  * Returns it by reference in the "number" parameter. */
 void PrimeGenerator::MakeRandom(BigInt &number, unsigned long int digitCount)
 {
-	//make sure there is enough space
-	if (number.length < digitCount + RandMax.digitCount)
-		number.expandTo(digitCount + RandMax.digitCount);
-
+	//the new number will be created using a string object (newNum), 
+	//and later converted into a BigInt
+	std::string newNum;
+	newNum.resize(digitCount);
 	unsigned long int tempDigitCount(0);
 
 	//generate random digits
-	while (tempDigitCount <= digitCount)
+	while (tempDigitCount < digitCount)
 	{
 		unsigned long int newRand(std::rand());
 
 		//10 is chosen to skip the first digit, because it might be 
-		//statistically <= n, where n is the first digit of RandMax
+		//statistically <= n, where n is the first digit of RAND_MAX
 		while (newRand >= 10)
 		{
-			number.digits[tempDigitCount] = newRand % 10;
+			newNum[tempDigitCount++] = (newRand % 10) + '0';
 			newRand /= 10;
-			tempDigitCount++;
+			if (tempDigitCount == digitCount)
+				break;
 		}
 	}
 
-	//adjust the digitCount property to the required number of digits
-	number.digitCount = digitCount;
 	//make sure the leading digit is not zero
-	if (number.digits[number.digitCount - 1] == 0)
-		number.digits[number.digitCount - 1] = (std::rand() % 9) + 1;
+	if (newNum[0] == '0')
+		newNum[0] = (std::rand() % 9) + 1 + '0';
+	number = newNum;
 }
 
-/* Generates a random "number" such as 1 <= "number" < "top".
- * Returns it by reference in the "number" parameter. */
+/* Generates a random number such as 1 <= number < 'top'.
+ * Returns it by reference in the 'number' parameter. */
 void PrimeGenerator::makeRandom(BigInt &number, const BigInt &top)
 {
 	//randomly select the number of digits for the random number
-	unsigned long int newDigitCount = (rand() % top.digitCount) + 1;
+	unsigned long int newDigitCount = (rand() % top.Length()) + 1;
 	MakeRandom(number, newDigitCount);
 	//make sure number < top
 	while (number >= top)
@@ -69,17 +65,17 @@ void PrimeGenerator::makeRandom(BigInt &number, const BigInt &top)
 }
 
 /* Creates an odd BigInt with the specified number of digits. 
-* Returns it by reference in the "number" parameter. */
+ * Returns it by reference in the "number" parameter. */
 void PrimeGenerator::makePrimeCandidate(BigInt &number,
 										unsigned long int digitCount)
 {
 	PrimeGenerator::MakeRandom(number, digitCount);
 	//make the number odd
-	if (!(number.digits[0] & 1))
-		number.digits[0]++;
+	if (!number.IsOdd())
+		number.SetDigit(0, number.GetDigit(0) + 1);
 	//make sure the leading digit is not a zero
-	if (number.digits[number.digitCount - 1] == 0)
-		number.digits[number.digitCount - 1] = (std::rand() % 9) + 1;
+	if (number.GetDigit(number.Length() - 1) == 0)
+		number.SetDigit(number.Length() - 1, (std::rand() % 9) + 1);
 }
 
 /* Tests the primality of the given _odd_ number using the 
@@ -100,7 +96,13 @@ bool PrimeGenerator::isProbablePrime(	const BigInt &number,
 	while (b.EqualsZero())
 	{
 		//temp = quotient * 2 + remainder
-		BigInt::divide(temp, two, quotient, b);
+		
+		//PrimeGenerator used to be a friend of BigInt, so the following 
+		//statement produced the result in one call to BigInt::divide()
+//		BigInt::divide(temp, two, quotient, b);
+		//That doesn't work any more, so we have to use two calls
+		quotient = temp / two;
+		b = temp % two;
 		temp = quotient;
 		a++;
 	}
@@ -139,7 +141,13 @@ bool PrimeGenerator::isWitness(	BigInt candidate,
 		if (candidate != BigIntOne && candidate != numberMinusOne)
 			maybeWitness = true;
 
-		BigInt::divide(candidate * candidate, number, quotient, candidate);
+		//PrimeGenerator used to be a friend of BigInt, so the following 
+		//statement produced the result in one call to BigInt::divide()
+//		BigInt::divide(candidate * candidate, number, quotient, candidate);
+		//That doesn't work any more, so we have to use two calls
+		candidate = candidate * candidate;
+		quotient = (candidate) / number;
+		candidate = (candidate) % number;
 		if (maybeWitness && candidate == BigIntOne)
 			return true; //definitely a composite number
 	}
@@ -155,13 +163,17 @@ bool PrimeGenerator::isWitness(	BigInt candidate,
 BigInt PrimeGenerator::Generate(unsigned long int digitCount, 
 								unsigned long int k)
 {
+	if (digitCount < 3)
+		throw "Error PRIMEGENERATOR00: Primes less than 3 digits long "
+				"not supported.";
+	
 	BigInt primeCandidate;
 	PrimeGenerator::makePrimeCandidate(primeCandidate, digitCount);
 	while (!isProbablePrime(primeCandidate, k))
 	{
 		//select the next odd number and try again
 		primeCandidate = primeCandidate + 2;
-		if (primeCandidate.digitCount != digitCount)
+		if (primeCandidate.Length() != digitCount)
 		PrimeGenerator::makePrimeCandidate(primeCandidate, digitCount);
 	}
 	return primeCandidate;

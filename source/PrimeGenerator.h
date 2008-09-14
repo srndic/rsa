@@ -1,7 +1,7 @@
 /* ****************************************************************************
  * 				PrimeGenerator.h
  * 
- * A class used to generate large prime numbers. 
+ * A class used to generate large prime or random numbers. 
  * 
  * Author: Nedim Srndic
  * Release date: 14th of March 2008
@@ -47,7 +47,7 @@ class PrimeGenerator
 		/* Returns a probable prime number "digitCount" digits long, 
 		 * with a probability of at least 1 - 4^(-k) that it is prime. */
 		static BigInt Generate(	unsigned long int digitCount, 
-								unsigned long int k);
+								unsigned long int k = 3);
 };
 
 #endif /*PRIMEGENERATOR_H_*/

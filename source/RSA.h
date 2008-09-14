@@ -9,9 +9,12 @@
  * 
  * RSA supports: 
  * 
- * 	- Message encryption 
- * 	- Message decryption 
- * 	- Public/private keypair generation 
+ * 	- Message encryption (string and file) (Encrypt())
+ * 	- Message decryption (string and file) (Decrypt())
+ * 	- Public/private keypair generation (GenerateKeyPair())
+ * 
+ * NOTE: All methods are static. Instantiation, copying and assignment of 
+ * 	objects of type RSA is forbidden. 
  * 
  * NOTE: it is highly recommended to call 
  * 		std::srand(time(NULL));
@@ -36,6 +39,13 @@
 class RSA
 {
 	private:
+		/* Instantiation of objects of type RSA is forbidden. */
+		RSA()
+		{}
+		/* Copying of objects of type RSA is forbidden. */
+		RSA(const RSA &rsa);
+		/* Assignment of objects of type RSA is forbidden. */
+		RSA &operator=(const RSA &rsa);
 		/* Returns the greatest common divisor of the two arguments 
 		 * "a" and "b", using the Euclidean algorithm. */
 		static BigInt GCD(const BigInt &a, const BigInt &b);
@@ -93,15 +103,8 @@ class RSA
 		static std::string Decrypt(	const std::string &cypherText, 
 									const Key &key);
 		/* Generates a public/private keypair. The keys are retured in a 
-		 * KeyPair. The generated keys are 
-		 * 2 * "digitCount" or 2 * "digitCount - 1 digits long, 
-		 * and have the probability of at least 1 - 4^(-k) of being prime. 
-		 * For k = 3, that probability is 98.4375%, 
-		 * and for k = 4 it is 99.609375%. 
-		 * k = 3 is recommended by Introduction to Algorithms, Second Edition;
-		 * by Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and 
-		 * Clifford Stein for prime number generation. 
-		 * */
+		 * KeyPair. The generated keys are 'digitCount' or 
+		 * 'digitCount' + 1 digits long. */
 		static KeyPair GenerateKeyPair(	unsigned long int digitCount, 
 										unsigned long int k = 3);
 };

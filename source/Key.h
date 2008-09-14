@@ -17,6 +17,7 @@
 #define KEY_H_
 
 #include "BigInt.h"
+#include <iostream>
 
 class Key
 {
@@ -26,9 +27,7 @@ class Key
 	public:
 		Key(const BigInt &modulus, const BigInt &exponent) :
 			modulus(modulus), exponent(exponent)
-		{
-	
-		}
+		{}
 		const BigInt &GetModulus() const
 		{
 			return modulus;
@@ -37,6 +36,7 @@ class Key
 		{
 			return exponent;
 		}
+		friend std::ostream &operator<<(std::ostream &cout, const Key &key);
 };
 
 #endif /*KEY_H_*/

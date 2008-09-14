@@ -26,12 +26,17 @@ void RandomBigIntTest(unsigned long int testCount);
 /*				RANDOM DIVISION TEST GENERATOR			*/
 void RandomBigIntDivisionTest(unsigned long int testCount);
 /*				PRIME GENERATOR TEST					*/
-void TestPrimeGenerator(unsigned long int testCount);
+void TestPrimeGenerator(unsigned long int testCount, 
+						unsigned long int digitCount = 10, 
+						unsigned long int iterationCount = 3);
 /*				KEY GENERATOR TEST						*/
-void TestKeyGeneration(unsigned long int testCount);
+void TestKeyGeneration(	unsigned long int testCount, 
+						unsigned long int keyLength = 20);
 /*				ENCRYPTION/DECRYPTION TEST				*/
-void TestEncryptionDecryption(unsigned long int testCount);
+void TestEncryptionDecryption(	unsigned long int testCount, 
+								unsigned long int keyLength = 6);
 /*				FILE ENCRYPTION/DECRYPTION TEST			*/
-void TestFileEncryptionDecryption(unsigned long int testCount);
+void TestFileEncryptionDecryption(	unsigned long int testCount, 
+									unsigned long int keyLength = 12);
 
 #endif /*TEST_H_*/

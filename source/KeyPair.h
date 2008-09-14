@@ -26,9 +26,7 @@ class KeyPair
 	public:
 		KeyPair(Key privateKey, Key publicKey): 
 			privateKey(privateKey), publicKey(publicKey)
-		{
-		
-		}
+		{}
 		const Key &GetPrivateKey() const
 		{
 			return privateKey;

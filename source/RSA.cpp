@@ -58,17 +58,18 @@ BigInt RSA::solveModularLinearEquation(	const BigInt &a,
 {
 	BigInt p, q, r;
 	RSA::extendedEuclideanAlgorithm(a, n, p, q, r);
-	if ((b % p).EqualsZero())
+	if ((b % p).EqualsZero())	// This has to evaluate to 'true'.
 		return (q * (b / p)) % n;
 	else
-		throw "Error RSA00: Error in key generation.";
+		throw "Error RSA00: Error in key generation."; // Detect mistakes.
 }
 
 /* Throws an exception if "key" is too short to be used. */
 void RSA::checkKeyLength(const Key &key)
 {
-	if (key.GetModulus().Length() < 7)
-			throw "Error RSA01: Insufficient key length.";
+	// Minimum required key length is around 24 bits. (In-house requirement)
+	if (key.GetModulus().Length() < 8)
+			throw "Error RSA01: Keys must be at least 8 digits long.";
 }
 
 /* Transforms a std::string message into a BigInt message. 
@@ -77,17 +78,26 @@ void RSA::checkKeyLength(const Key &key)
  * 'decoded' as a three-digit number, from left to right. */
 BigInt RSA::encode(const string &message)
 {
-	BigInt encoded;
-	encoded.digitCount = message.length() * 3;
-	encoded.expandTo(encoded.digitCount + 4);
+	// The new number will be created using a string object (encoded), 
+	// and converted into a BigInt on return.
+	string encoded;
+	encoded.resize(message.length() * 3 + 1);
+	unsigned long int index = message.length() * 3;
 	for (unsigned long int i(0); i < message.length(); i++)
 	{
+		// Encode the characters using their ASCII values' digits as
+		// BigInt digits. 
 		unsigned char ASCII = message[i];
-		encoded.digits[i * 3 + 2] = ASCII % 10;
+		encoded[index - 2] = (ASCII % 10) + '0';
 		ASCII /= 10;
-		encoded.digits[i * 3 + 1] = ASCII % 10;
-		encoded.digits[i * 3] = ASCII / 10;
+		encoded[index - 1] = (ASCII % 10) + '0';
+		encoded[index] = (ASCII / 10) + '0';
+		index -= 3;
 	}
+	// We add an special symbol '1' to the beginning of the string 'encoded' 
+	// to make sure that the returned BigInt doesn't begin with a zero. We also
+	// need to make sure we remove that '1' when decoding (see RSA::decode()). 
+	encoded[0] = '1';
 	return encoded;
 }
 
@@ -95,11 +105,17 @@ BigInt RSA::encode(const string &message)
 string RSA::decode(const BigInt &message)
 {
 	string decoded;
-	for (unsigned long int i(0); i < message.digitCount / 3; i++)
+	// The special symbol '1' we added to the beginning of the encoded message 
+	// will now be positioned at message[message.Length() - 1], and 
+	// message.Length() -1 must be divisible by 3 without remainder. Thus we 
+	// can ignore the special symbol by only using digits in the range 
+	// from message[0] to message[message.Length() - 2]. 
+	for (unsigned long int i(0); i < message.Length() / 3; i++)
 	{
-		char ASCII = 100 * char(message.digits[i * 3]);
-		ASCII += 10 * char(message.digits[i * 3 + 1]);
-		decoded.push_back(ASCII + char(message.digits[i * 3 + 2]));
+		// Decode the characters using the ASCII values in the BigInt digits. 
+		char ASCII = 100 * char(message.GetDigit(i * 3));
+		ASCII += 10 * char(message.GetDigit(i * 3 + 1));
+		decoded.push_back(ASCII + char(message.GetDigit(i * 3 + 2)));
 	}
 	return decoded;
 }
@@ -107,7 +123,9 @@ string RSA::decode(const BigInt &message)
 /* Encrypts a "chunk" (a small part of a message) using "key" */
 string RSA::encryptChunk(const string &chunk, const Key &key)
 {
+	// First encode the chunk, to make sure it is represented as an integer. 
 	BigInt a = RSA::encode(chunk);
+	// The RSA encryption algorithm is a congruence equation. 
 	a.SetPowerMod(key.GetExponent(), key.GetModulus());
 	return a.ToString();
 }
@@ -116,51 +134,55 @@ string RSA::encryptChunk(const string &chunk, const Key &key)
 string RSA::decryptChunk(const BigInt &chunk, const Key &key)
 {
 	BigInt a = chunk;
+	// The RSA decryption algorithm is a congruence equation. 
 	a.SetPowerMod(key.GetExponent(), key.GetModulus());
+	// Decode the message to a readable form. 
 	return RSA::decode(a);
 }
 
 /* Encrypts a string "message" using "key". */
 std::string RSA::encryptString(const std::string &message, const Key &key)
 {
-	//partition the message into manageable chunks
-	const unsigned long int chunkSize(((key.GetModulus().Length()-1)/3)-1);
+	//partition the message into biggest possible encryptable chunks
+	const unsigned long int chunkSize(((key.GetModulus().Length() - 2) / 3));
 	const unsigned long int chunkCount = message.length() / chunkSize;
 	
 	string cypherText;
 	for (unsigned long int i(0); i < chunkCount; i++)
 	{
-		//extract and encrypt the chunks
+		// Get the next chunk.
 		string chunk(message.substr(i * chunkSize, chunkSize));
-		chunk = RSA::encryptChunk(chunk + "a", key);
+		chunk = RSA::encryptChunk(chunk, key);
+		// Put a ' ' between the chunks so that we can separate them later. 
 		cypherText.append(chunk.append(" "));
 	}
+	// If the last chunk has the same size as the others, we are finished. 
 	if (chunkSize * chunkCount == message.length())
 		return cypherText;
 	
-	//handle the last chunk. It is smaller than the others
+	// Handle the last chunk. It is smaller than the others. 
 	const unsigned long int lastChunkSize = message.length() % chunkSize;
 	string lastChunk(message.substr(chunkCount * chunkSize, lastChunkSize));
-	lastChunk = RSA::encryptChunk(lastChunk + "a", key);
+	lastChunk = RSA::encryptChunk(lastChunk, key);
 	return cypherText.append(lastChunk.append(" "));
 }
 
 /* Decrypts a string "message" using "key". */
 std::string RSA::decryptString(const std::string &cypherText, const Key &key)
 {
-	//partition the cypherText into manageable chunks
+	// Partition the cypherText into chunks. They are seperated by ' '. 
 	string message;
 	long int i(0), j(0);
 	while ((j = cypherText.find(' ', i)) != -1)
 	{
-		//there are spaces between chunks
+		// Get the chunk. 
 		BigInt chunk(cypherText.substr(i, j - i));
 		if (chunk >= key.GetModulus())
 			throw "Error RSA02: Chunk too large.";
 		
-		//decrypt the chunks
+		// Decrypt the chunk and store the message. 
 		string text = RSA::decryptChunk(chunk, key);
-		message.append(text.substr(0, text.length() - 1));
+		message.append(text);
 		i = j + 1;
 	}
 	return message;
@@ -272,7 +294,7 @@ void RSA::Decrypt(	const char *sourceFile, const char *destFile,
 	while (readCount < fileSize)
 	{
 		unsigned long int readLength; 
-		//read the chunk
+		//read new data
 		if (fileSize - readCount >= bufferSize)	//if it's not the last one
 			readLength = sizeof buffer;
 		else
@@ -281,11 +303,12 @@ void RSA::Decrypt(	const char *sourceFile, const char *destFile,
 		if (!source)
 			RSA::fileError(source.eof(), source.bad());
 		
-		//encrypt the chunk
+		//find the next chunk
 		std::string chunk(buffer, readLength);
 		chunk = chunk.substr(0, chunk.find_last_of(' ', chunk.length()) + 1);
 		readCount += chunk.length();
 		source.seekg(readCount, std::ios::beg);
+		//decrypt the chunk
 		chunk = RSA::decryptString(chunk, key);
 		//write the chunk
 		dest.write(chunk.c_str(), chunk.length());
@@ -298,23 +321,22 @@ void RSA::Decrypt(	const char *sourceFile, const char *destFile,
 }
 
 /* Generates a public/private keypair. The keys are retured in a 
- * KeyPair. The generated keys are 
- * 2 * "digitCount" or 2 * "digitCount" - 1 digits long, 
- * and have the probability of at least 1 - 4^(-k) of being prime. 
- * For k = 3, that probability is 98.4375%, 
- * and for k = 4 it is 99.609375%. 
- * */
+ * KeyPair. The generated keys are 'digitCount' or 
+ * 'digitCount' + 1 digits long. */
 KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount, 
 								unsigned long int k)
 {
-	//generate two random numbers p and q, each "digitCount" digits long
-	BigInt p(PrimeGenerator::Generate(digitCount, k));
-	BigInt q(PrimeGenerator::Generate(digitCount, k));
+	if (digitCount < 8)
+		throw "Error RSA10: Keys must be at least 8 digits long.";
+	
+	//generate two random numbers p and q
+	BigInt p(PrimeGenerator::Generate(digitCount / 2 + 2, k));
+	BigInt q(PrimeGenerator::Generate(digitCount / 2 - 1, k));
 	
 	//make sure they are different
 	while (p == q)
 	{
-		p = PrimeGenerator::Generate(digitCount, k);
+		p = PrimeGenerator::Generate(digitCount / 2 + 1, k);
 	}
 	
 	//calculate the modulus of both the public and private keys, n
@@ -322,10 +344,6 @@ KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount,
 	
 	//calculate the totient phi
 	BigInt phi((p - BigIntOne) * (q - BigIntOne));
-	
-	//we don't want the keys to be less than 20 bits long
-	if (phi < "1048576")
-		throw "Error RSA10: Insufficient key strength!";
 	
 	//select a small odd integer e that is coprime with phi and e < phi
 	//usually 65537 is used, and we will use it too if it fits
@@ -342,9 +360,10 @@ KeyPair RSA::GenerateKeyPair(	unsigned long int digitCount,
 	//e is the public key exponent, n is the modulus
 	Key publicKey(n, e);
 	
-	//calculate d, de = 1 (mod phi)
+	//calculate d, d * e = 1 (mod phi)
 	BigInt d(RSA::solveModularLinearEquation(e, BigIntOne, phi));
 	
+	//we need a positive private exponent
 	if (!d.IsPositive())
 		return RSA::GenerateKeyPair(digitCount, k);
 	

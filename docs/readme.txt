@@ -122,7 +122,7 @@ bigger one.
 
 There are two benchmarks implemented: prime generation and key generation 
 benchmarks. They rely on scilab (an open-source scientific software package 
-for numerical computation), and can only be ran on GNU/Linux systems. 
+for numerical computation), and can only be ran on POSIX systems. 
 The benchmarks can be run by running the timeprimes.sh or timekeys.sh shell 
 scripts, without parameters or with two parameters representing a range of 
 numbers. The numbers from that range are used for input in the main program, 

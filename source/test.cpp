@@ -20,6 +20,7 @@
 #include <ctime>	//clock...
 #include <cstdlib>
 #include <string>	//BigInt::operator std::string() const
+#include <climits>	// ULONG_MAX
 
 using std::cout;
 using std::endl;
@@ -239,7 +240,9 @@ void TestBigIntFunctions()
 	a = 2;
 	cout << a.GetPower(63) << endl;
 	test(a.GetPower(63), "9223372036854775808");
+	cout << a.GetPower(64) << endl;
 	test(a.GetPower(64), "18446744073709551616");
+	cout << a.GetPower(71) << endl;
 	test(a.GetPower(71), "2361183241434822606848");
 	test(a.GetPower(0), "1");
 	a = "10";

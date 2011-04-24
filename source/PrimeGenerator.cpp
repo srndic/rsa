@@ -19,6 +19,7 @@
 
 #include "PrimeGenerator.h"
 #include <string>
+#include <cstdlib> // rand()
 
 /* Generates a random number with digitCount digits.
  * Returns it by reference in the "number" parameter. */
